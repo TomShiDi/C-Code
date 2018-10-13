@@ -1,6 +1,0 @@
-int wages[5]={42,38,44,52,40};
-extern unsigned int weekpay(int wages[]);
-main()
-{
-	printf("Weekly pay=%u\n",weekpay(wages));
-}
