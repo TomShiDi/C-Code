@@ -1,0 +1,135 @@
+Microsoft (R) Macro Assembler Version 5.00                  10/29/4                                                             Page     1-1
+
+
+				;p192.asm,ÔöÐòÕýÊýÊý×éÖÐ²éÕÒÒ»¸öÕýÊý£¬ÕÛ°ë²éÕÒ¡
+				£ 
+				;ÓÐÔò½«ÆäÐòºÅËÍsi²¢ËÍflagµ¥Ôª£¬cf¡û0£»·ñÔòcf¡û1
+				£¬flagµ¥ÔªÖÃ-1¡£ 
+				;******************************************* 
+ 0000				data	segment 
+ 0000  000A 0003 0005 000F	array	dw	10,3,5,15,23,37,49,52,65,78,99 
+       0017 0025 0031 0034	
+       0041 004E 0063		
+ 0016  0020			n	dw 	32 
+ 0018  0000			flag	dw	0 
+ 001A  ????			low_idx	dw	? 
+ 001C  ????			hi_idx	dw	? 
+ 001E				data	ends 
+				;******************************************* 
+ 0000				program	segment 
+ 0000				main	proc	far 
+					assume	cs:program,ds:data,es:data 
+ 0000  1E			start:	push 	ds 
+ 0001  2B C0				sub	ax,ax 
+ 0003  50				push	ax 
+ 0004  B8 ---- R			mov	ax,data 
+ 0007  8E D8				mov	ds,ax		;¹Ì¶¨Ä£Ê½ 
+ 0009  8E C0				mov	es,ax 
+ 000B  A1 0016 R			mov	ax,n		;¼ìË÷¶ÔÏó 
+ 000E  BF 0000 R			mov	di,offset array	;Ã»ÓÐoffset´í¡£
+				 
+ 0011  26: 3B 45 02			cmp	ax,es:[di+2] 
+ 0015  77 09				ja	chk_la		;±ÈÊ×ÔªËØ´ó£¬¼Ì
+				Ðø²éÕÒ¡£ 
+ 0017  8D 75 02				lea	si,es:[di+2]	;ÕÒµ½£¬ÇÒcf£½0£
+				¬siÎªÔªËØµØÖ·¡£ 
+ 001A  74 56				je	found 
+ 001C  F9				stc			 
+ 001D  EB 4B 90				jmp	nomatch		;cf=1,Î´ÕÒµ½¡£ 
+ 0020  26: 8B 35		chk_la:	mov	si,es:[di]	;diËùÖ¸ÎªÔªËØ¸ö
+				Êý¡£ 
+ 0023  D1 E6				shl	si,1		;ÒòÎªÊÇ×Ö£¬ËùÒÔ
+				³Ë2 
+ 0025  03 F7				add	si,di		;¼´siÖ¸Ïò×îºóÔª
+				ËØ¡£ 
+ 0027  26: 3B 04			cmp	ax,es:[si]	 
+ 002A  72 06				jb	search		;±ÈÄ©ÔªËØÐ¡£¬¼Ì
+				Ðø²éÕÒ¡£ 
+ 002C  74 44				je	found		;ÕÒµ½£¬ÇÒcf£½0£
+				¬siÎªÔªËØµØÖ·¡£ 
+ 002E  F9				stc 
+ 002F  EB 39 90				jmp	nomatch		;cf=1,Î´ÕÒµ½¡£ 
+ 0032  C7 06 001A R 0001	search:	mov	low_idx,1	;low_idx¡û1£¬³õ
+				Öµ¡£ 
+ 0038  26: 8B 1D			mov	bx,es:[di] 
+ 003B  89 1E 001C R			mov 	hi_idx,bx	;hi_idx¡ûÔªËØ¸ö
+				Êý£¬³õÖµ¡£ 
+ 003F  8B DF				mov	bx,di 
+Microsoft (R) Macro Assembler Version 5.00                  10/29/4                                                             Page     1-2
+
+
+ 0041  8B 0E 001A R		mid:	mov	cx,low_idx	;ÐÂ×ó¶Ë¡£ 
+ 0045  8B 16 001C R			mov	dx,hi_idx	;ÐÂÓÒ¶Ë¡£ 
+ 0049  3B CA				cmp	cx,dx		 
+ 004B  77 1D				ja	nomatch		;×ó¶Ë³¬¹ýÓÒ¶Ë£¬
+				¼´Î´ÕÒµ½¡£ 
+ 004D  03 CA				add	cx,dx		;ÕÛ°ë¡£ 
+ 004F  D1 E9				shr	cx,1		;(×ó¶Ë£«ÓÒ¶Ë)/2
+				¡£ 
+ 0051  8B F1				mov	si,cx 
+ 0053  D1 E6				shl	si,1 
+ 0055  26: 3B 00		compare:cmp	ax,es:[bx+si]	;ºÍÖÐ¼äµÄ±È½Ï¡£
+				 
+ 0058  74 18				je	found		;ÏàµÈ£¬ÕÒµ½¡£ 
+ 005A  77 07				ja	higher		 
+ 005C  49				dec	cx		;ÔÚµÍÒ»°ë¡£ 
+ 005D  89 0E 001C R			mov	hi_idx,cx	;ÖÐ¶Ë×÷ÓÒ¶Ë¡£ 
+ 0061  EB DE				jmp	mid 
+ 0063  41			higher:	inc	cx		;ÔÚ¸ßÒ»°ë¡£ 
+ 0064  89 0E 001A R			mov	low_idx,cx	;ÖÐ¶Ë×÷×ó¶Ë¡£ 
+ 0068  EB D7				jmp	mid 
+ 006A  C7 06 0018 R FFFF	nomatch:mov	flag,-1 
+ 0070  F9				stc 
+ 0071  CB				ret 
+ 0072  89 36 0018 R		found:	mov 	flag,si 
+ 0076  CB				ret 
+ 0077				main	endp 
+ 0077				program	ends 
+					end start 
+Microsoft (R) Macro Assembler Version 5.00                  10/29/4                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+DATA . . . . . . . . . . . . . .  	001E	PARA	NONE	
+PROGRAM  . . . . . . . . . . . .  	0077	PARA	NONE	
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+ARRAY  . . . . . . . . . . . . .  	L WORD	0000	DATA
+
+CHK_LA . . . . . . . . . . . . .  	L NEAR	0020	PROGRAM
+COMPARE  . . . . . . . . . . . .  	L NEAR	0055	PROGRAM
+
+FLAG . . . . . . . . . . . . . .  	L WORD	0018	DATA
+FOUND  . . . . . . . . . . . . .  	L NEAR	0072	PROGRAM
+
+HIGHER . . . . . . . . . . . . .  	L NEAR	0063	PROGRAM
+HI_IDX . . . . . . . . . . . . .  	L WORD	001C	DATA
+
+LOW_IDX  . . . . . . . . . . . .  	L WORD	001A	DATA
+
+MAIN . . . . . . . . . . . . . .  	F PROC	0000	PROGRAM	Length = 0077
+MID  . . . . . . . . . . . . . .  	L NEAR	0041	PROGRAM
+
+N  . . . . . . . . . . . . . . .  	L WORD	0016	DATA
+NOMATCH  . . . . . . . . . . . .  	L NEAR	006A	PROGRAM
+
+SEARCH . . . . . . . . . . . . .  	L NEAR	0032	PROGRAM
+START  . . . . . . . . . . . . .  	L NEAR	0000	PROGRAM
+
+@FILENAME  . . . . . . . . . . .  	TEXT  p192_2		
+
+
+     65 Source  Lines
+     65 Total   Lines
+     18 Symbols
+
+  50166 + 450842 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

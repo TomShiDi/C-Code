@@ -1,0 +1,71 @@
+Microsoft (R) Macro Assembler Version 5.00                  10/23/4                                                             Page     1-1
+
+
+				;p187.asm,Ã°ÅÝ·¨ 
+				;******************************************* 
+ 0000				data	segment 
+ 0000  0008 0005 0010 0054	addr	dw	8,5,16,84,32,22,15,39,50,2 
+       0020 0016 000F 0027	
+       0032 0002		
+ 0014				data	ends 
+				;******************************************* 
+ 0000				program	segment 
+ 0000				main	proc	far 
+					assume	cs:program,ds:data 
+ 0000  1E			start:	push 	ds 
+ 0001  2B C0				sub	ax,ax 
+ 0003  50				push	ax 
+ 0004  B8 ---- R			mov	ax,data 
+ 0007  8E D8				mov	ds,ax 
+ 0009  B9 0009				mov	cx,9 
+ 000C  8B F9			loop1:	mov	di,cx 
+ 000E  BB 0000				mov	bx,0 
+ 0011  8B 87 0000 R		loop2:	mov	ax,addr[bx] 
+ 0015  3B 87 0002 R			cmp	ax,addr[bx+2] 
+ 0019  7D 08				jge	continu 
+ 001B  87 87 0002 R			xchg	ax,addr[bx+2] 
+ 001F  89 87 0000 R			mov	addr[bx],ax 
+ 0023  83 C3 02			continu:add	bx,2 
+ 0026  E2 E9				loop	loop2 
+ 0028  8B CF				mov	cx,di 
+ 002A  E2 E0				loop	loop1 
+ 002C  CB				ret 
+ 002D				main	endp 
+ 002D				program	ends 
+					end start 
+Microsoft (R) Macro Assembler Version 5.00                  10/23/4                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+DATA . . . . . . . . . . . . . .  	0014	PARA	NONE	
+PROGRAM  . . . . . . . . . . . .  	002D	PARA	NONE	
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+ADDR . . . . . . . . . . . . . .  	L WORD	0000	DATA
+
+CONTINU  . . . . . . . . . . . .  	L NEAR	0023	PROGRAM
+
+LOOP1  . . . . . . . . . . . . .  	L NEAR	000C	PROGRAM
+LOOP2  . . . . . . . . . . . . .  	L NEAR	0011	PROGRAM
+
+MAIN . . . . . . . . . . . . . .  	F PROC	0000	PROGRAM	Length = 002D
+
+START  . . . . . . . . . . . . .  	L NEAR	0000	PROGRAM
+
+@FILENAME  . . . . . . . . . . .  	TEXT  p187		
+
+
+     30 Source  Lines
+     30 Total   Lines
+     10 Symbols
+
+  50180 + 450828 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

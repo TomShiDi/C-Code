@@ -1,0 +1,302 @@
+Microsoft (R) Macro Assembler Version 5.00                  11/28/4                                                             Page     1-1
+
+
+				;用文件代号建立文件。 
+				; 
+ 0000				stack   segment para stack 'stack' 
+ 0000  0050[			        dw 80 dup(?) 
+	   ????			
+			 ]	
+				
+ 00A0				stack   ends 
+				;-------------------------------------- 
+ 0000				dseg    segment para 'data' 
+ 0000				namepar label 	byte 
+ 0000  1E			maxlen  db 	30		;输入缓冲区 
+ 0001  ??			namelen db 	? 
+ 0002  001E[			namerec db 	30 dup(?),13,10 
+	    ??			
+			 ]	
+       0D 0A			
+				; 
+ 0022  00			errcde  db 	0 
+ 0023  ????			handle  dw 	?		;文件代号 
+ 0025  61 3A 2F 6E 61 6D 65	pathnam db 	'a:/name0.dat',0 
+       30 2E 64 61 74 00	
+ 0032  6E 61 6D 65 20 3F	prompt  db 	'name ?' 
+ 0038  01			row     db 	01 
+ 0039  2A 2A 2A 2A 20 6F 70	opnmsg  db 	'**** open error ****',13,10 
+       65 6E 20 65 72 72 6F	
+       72 20 2A 2A 2A 2A 0D	
+       0A			
+ 004F  2A 2A 2A 2A 20 77 72	wrtmsg  db 	'**** write error ****',13,10 
+       69 74 65 20 65 72 72	
+       6F 72 20 2A 2A 2A 2A	
+       0D 0A			
+ 0066				dseg    ends 
+				;----------------------------------------- 
+ 0000				cseg    segment para 'code' 
+				        assume 	cs:cseg,ds:dseg,ss:stack,es:dse
+				g 
+ 0000  B8 ---- R		begin:  mov 	ax,dseg 
+ 0003  8E D8			        mov 	ds,ax 
+ 0005  8E C0			        mov 	es,ax 
+				; 
+ 0007  B8 0600			        mov 	ax,0600h 
+ 000A  E8 00C2 R		        call 	scren 
+ 000D  E8 00CD R		        call 	curs 
+ 0010  E8 002B R		        call 	creath 
+ 0013  80 3E 0022 R 00		        cmp 	errcde,0 
+ 0018  75 0D			        jnz 	exit 
+ 001A  E8 0044 R		contin: call 	proch 
+ 001D  80 3E 0001 R 00		        cmp 	namelen,0 
+ 0022  75 F6			        jnz 	contin 
+ 0024  E8 00B1 R		        call 	clseh 
+ 0027  B4 4C			exit:   mov 	ah,4ch 
+ 0029  CD 21			        int 	21h 
+				;----------------------------------------------
+Microsoft (R) Macro Assembler Version 5.00                  11/28/4                                                             Page     1-2
+
+
+				- 
+				;过程名：creath 
+				;功能：利用3ch功能调用建立文件，将文件代号存han
+				dle。 
+				;入口参数：文件名ASCIZ串地址，handle单元 
+				;返回值：成功将文件代号存handle；否则显示出错提
+				示。 
+				; 
+				; 
+ 002B				creath  proc 
+ 002B  B4 3C			        mov 	ah,3ch 
+ 002D  B9 0000			        mov 	cx,0 
+ 0030  8D 16 0025 R		        lea 	dx,pathnam 
+ 0034  CD 21			        int 	21h 
+ 0036  72 04			        jc 	err1 
+ 0038  A3 0023 R		        mov 	handle,ax 
+ 003B  C3			        ret 
+ 003C  8D 16 0039 R		err1:   lea 	dx,opnmsg 
+ 0040  E8 00DA R		        call 	errm 
+ 0043  C3			        ret 
+ 0044				creath  endp 
+				;----------------------------------------------
+				------ 
+				;过程名：proch 
+				;功能：输入字符串（不足30个空格补充），并转子写
+				入文件。 
+				;入口参数：提示信息首地址prompt，缓冲区首址name
+				par。 
+				;返回值：字符串。 
+				; 
+				; 
+ 0044				proch   proc 
+ 0044  B4 40			        mov 	ah,40h 
+ 0046  BB 0001			        mov 	bx,01       ;文件代号，标准输出
+				设备 
+ 0049  B9 0006			        mov 	cx,6 
+ 004C  8D 16 0032 R		        lea 	dx,prompt   ;输出提示信息收地址
+				。 
+ 0050  CD 21			        int 	21h 
+ 0052  B4 0A			        mov 	ah,0ah 
+ 0054  8D 16 0000 R		        lea 	dx,namepar 
+ 0058  CD 21			        int 	21h         ;输入一个串到缓冲区
+				。 
+ 005A  80 3E 0001 R 00		        cmp 	namelen,0 
+ 005F  74 1C			        jz 	exit2 
+ 0061  B0 20			contin2:mov 	al,20h	    ;除开输入字符外其余
+				都置空格。 
+ 0063  2A ED			        sub 	ch,ch 
+ 0065  8A 0E 0001 R		        mov 	cl,namelen 
+ 0069  8D 3E 0002 R		        lea 	di,namerec 
+ 006D  03 F9			        add 	di,cx	    ;此时di指向最后一个
+				元素。 
+ 006F  F7 D9			        neg 	cx 
+ 0071  83 C1 1E			        add 	cx,30	    ;cx=30-cx=30-namele
+Microsoft (R) Macro Assembler Version 5.00                  11/28/4                                                             Page     1-3
+
+
+				n 
+ 0074  FC			        cld 
+ 0075  F3/ AA			        rep 	stosb 
+ 0077  E8 0093 R		        call 	writh 
+ 007A  E8 007E R		        call 	scrl 
+ 007D  C3			exit2:  ret 
+ 007E				proch   endp 
+				;----------------------------------------------
+				---------- 
+				;过程名：scr1 
+				;功能：当一屏满时，转子scren,curs实现滚屏。 
+				;入口参数：当前行数row单元。 
+				;返回值：无。修改row单元。 
+				; 
+				; 
+ 007E				scrl    proc 
+ 007E  80 3E 0038 R 18		        cmp 	row,18h 
+ 0083  73 04			        jae 	cont3 
+ 0085  FE 06 0038 R		        inc 	row	    ;输入缓冲区后已加回
+				车换行。省几条指令。 
+ 0089  B8 0601			cont3:  mov 	ax,0601h 
+ 008C  E8 00C2 R		        call 	scren 
+ 008F  E8 00CD R		        call 	curs 
+ 0092  C3			        ret 
+ 0093				scrl    endp 
+				;----------------------------------------------
+				---------- 
+				;过程名：writh 
+				;功能：写磁盘文件 
+				;入口参数：文件代号在handle中，写记录首址namere
+				c。 
+				;返回值：成功则返回。否则显示出错信息。 
+				; 
+				; 
+ 0093				writh   proc 
+ 0093  B4 40			        mov 	ah,40h 
+ 0095  8B 1E 0023 R		        mov 	bx,handle 
+ 0099  B9 0020			        mov 	cx,32 
+ 009C  8D 16 0002 R		        lea 	dx,namerec 
+ 00A0  CD 21			        int 	21h 
+ 00A2  73 0C			        jnc 	exit4 
+ 00A4  8D 16 004F R		        lea 	dx,wrtmsg 
+ 00A8  E8 00DA R		        call 	errm 
+ 00AB  C6 06 0001 R 00		        mov 	namelen,0 
+ 00B0  C3			exit4:  ret 
+ 00B1				writh   endp 
+				;----------------------------------------------
+				- 
+				;过程名：clseh 
+				;功能：将handle所指文件关闭。 
+				;入口参数：文件代号单元handle。 
+				;返回值：无。 
+				; 
+				; 
+Microsoft (R) Macro Assembler Version 5.00                  11/28/4                                                             Page     1-4
+
+
+ 00B1				clseh   proc 
+ 00B1  C6 06 0002 R 1A		        mov 	namerec,1ah 
+ 00B6  E8 0093 R		        call 	writh 
+ 00B9  B4 3E			        mov 	ah,3eh 
+ 00BB  8B 1E 0023 R		        mov 	bx,handle 
+ 00BF  CD 21			        int 	21h 
+ 00C1  C3			        ret 
+ 00C2				clseh   endp 
+				;----------------------------------------------
+				--- 
+				;过程名：scren 
+				;功能：设置显示方式。 
+				;入口参数：ax中为显示方式。 
+				;返回值：无。设置了新的显示方式。 
+				; 
+				; 
+ 00C2				scren   proc 
+ 00C2  B7 1E			        mov 	bh,1eh		;卷入行属性蓝底
+				黄字。 
+ 00C4  B9 0000			        mov 	cx,0		;左上角 
+ 00C7  BA 184F			        mov 	dx,184fh	;右下角 
+ 00CA  CD 10			        int 	10h 
+ 00CC  C3			        ret 
+ 00CD				scren   endp 
+				;--------------------------------------------- 
+				;过程名：curs 
+				;功能：调用BIOS功能调用设置光标位置。 
+				;入口参数：行号单元row。 
+				;返回值：无。但光标定位在指定位置。 
+				; 
+				; 
+ 00CD				curs    proc 
+ 00CD  B4 02			        mov 	ah,2 
+ 00CF  B7 00			        mov 	bh,0 
+ 00D1  8A 36 0038 R		        mov 	dh,row 
+ 00D5  B2 00			        mov 	dl,0 
+ 00D7  CD 10			        int 	10h 
+ 00D9  C3			        ret 
+ 00DA				curs    endp 
+				;--------------------------------------------- 
+				;过程名：errm 
+				;功能：写设备。并将errcde单元置1（表出错） 
+				;入口参数：ASCIZ串首址已在ds:dx。 
+				;返回值：使errcde单元置1。 
+				; 
+				; 
+ 00DA				errm    proc 
+ 00DA  B4 40			        mov 	ah,40h 
+ 00DC  BB 0001			        mov 	bx,1 
+ 00DF  B9 0021			        mov 	cx,21h 
+ 00E2  CD 21			        int 	21h 
+ 00E4  C6 06 0022 R 01		        mov 	errcde,1 
+ 00E9  C3			        ret 
+ 00EA				errm    endp 
+Microsoft (R) Macro Assembler Version 5.00                  11/28/4                                                             Page     1-5
+
+
+				;----------------------------------------------
+				--- 
+ 00EA				cseg    ends 
+				        end 	begin 
+Microsoft (R) Macro Assembler Version 5.00                  11/28/4                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+CSEG . . . . . . . . . . . . . .  	00EA	PARA	NONE	'CODE'
+DSEG . . . . . . . . . . . . . .  	0066	PARA	NONE	'DATA'
+STACK  . . . . . . . . . . . . .  	00A0	PARA	STACK	'STACK'
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+BEGIN  . . . . . . . . . . . . .  	L NEAR	0000	CSEG
+
+CLSEH  . . . . . . . . . . . . .  	N PROC	00B1	CSEG	Length = 0011
+CONT3  . . . . . . . . . . . . .  	L NEAR	0089	CSEG
+CONTIN . . . . . . . . . . . . .  	L NEAR	001A	CSEG
+CONTIN2  . . . . . . . . . . . .  	L NEAR	0061	CSEG
+CREATH . . . . . . . . . . . . .  	N PROC	002B	CSEG	Length = 0019
+CURS . . . . . . . . . . . . . .  	N PROC	00CD	CSEG	Length = 000D
+
+ERR1 . . . . . . . . . . . . . .  	L NEAR	003C	CSEG
+ERRCDE . . . . . . . . . . . . .  	L BYTE	0022	DSEG
+ERRM . . . . . . . . . . . . . .  	N PROC	00DA	CSEG	Length = 0010
+EXIT . . . . . . . . . . . . . .  	L NEAR	0027	CSEG
+EXIT2  . . . . . . . . . . . . .  	L NEAR	007D	CSEG
+EXIT4  . . . . . . . . . . . . .  	L NEAR	00B0	CSEG
+
+HANDLE . . . . . . . . . . . . .  	L WORD	0023	DSEG
+
+MAXLEN . . . . . . . . . . . . .  	L BYTE	0000	DSEG
+
+NAMELEN  . . . . . . . . . . . .  	L BYTE	0001	DSEG
+NAMEPAR  . . . . . . . . . . . .  	L BYTE	0000	DSEG
+NAMEREC  . . . . . . . . . . . .  	L BYTE	0002	DSEG	Length = 001E
+
+OPNMSG . . . . . . . . . . . . .  	L BYTE	0039	DSEG
+
+PATHNAM  . . . . . . . . . . . .  	L BYTE	0025	DSEG
+PROCH  . . . . . . . . . . . . .  	N PROC	0044	CSEG	Length = 003A
+PROMPT . . . . . . . . . . . . .  	L BYTE	0032	DSEG
+
+ROW  . . . . . . . . . . . . . .  	L BYTE	0038	DSEG
+
+SCREN  . . . . . . . . . . . . .  	N PROC	00C2	CSEG	Length = 000B
+SCRL . . . . . . . . . . . . . .  	N PROC	007E	CSEG	Length = 0015
+
+WRITH  . . . . . . . . . . . . .  	N PROC	0093	CSEG	Length = 001E
+WRTMSG . . . . . . . . . . . . .  	L BYTE	004F	DSEG
+
+@FILENAME  . . . . . . . . . . .  	TEXT  p483		
+
+Microsoft (R) Macro Assembler Version 5.00                  11/28/4                                                             Symbols-2
+
+
+
+    186 Source  Lines
+    186 Total   Lines
+     34 Symbols
+
+  50408 + 434216 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

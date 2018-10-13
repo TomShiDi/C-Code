@@ -1,0 +1,34 @@
+#include<stdio.h>
+int main()
+{
+	int a,b,c,t,i,j,sum;
+	scanf("%d",&t);
+	for(;t>0;t--)
+	{
+		scanf("%d",&b);
+		sum=0;
+		for(i=1;i<=b;i++)
+		{
+			j=i;
+			while(j>=10)
+			{
+				c=0;
+				while(j>0)
+				{
+				    c=c+j%10;
+				    j=j/10;
+				}
+				j=c;
+			}
+			sum=(sum+j)%10000;
+		}
+		printf("%d\n",sum);
+	}
+	return 0;
+}
+				
+
+
+
+
+

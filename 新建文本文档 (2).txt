@@ -1,0 +1,11 @@
+#include<stdio.h>
+int main()
+{
+	__int64 a,b,c;
+	scanf("%I64d",&a);
+	scanf("%I64d",&b);
+	c=a+b;
+	printf("%I64d",c);
+	return 0;
+}
+

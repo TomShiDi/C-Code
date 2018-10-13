@@ -1,0 +1,56 @@
+Microsoft (R) Macro Assembler Version 5.00                  11/21/4                                                             Page     1-1
+
+
+				;p309.asm，扬声器发声程序。 
+				;使端口61h的第1位交替为0/1，控制扬声器发声。 
+				; 
+				; 
+ 0000				pseg     segment 
+				         assume  cs:pseg,ds:pseg 
+ 0100				         org 100h 
+ 0100  BA 0064			start:   mov  dx,100 
+ 0103  E4 61			         in   al,61h 
+ 0105  24 FC			         and  al,0fch 
+ 0107  34 02			sound:   xor  al,2	;61h的第1位求反 
+ 0109  E6 61			         out  61h,al 
+ 010B  BB 03E8			         mov  bx,1000 
+ 010E  B9 FFFF			wait1:   mov  cx,0ffffh	;延时 
+ 0111  E2 FE			wait0:   loop wait0 
+ 0113  4B			         dec  bx 
+ 0114  75 F8			         jne  wait1 
+ 0116  4A			         dec  dx 
+ 0117  75 EE			         jne  sound 
+ 0119  B4 4C			         mov  ah,4ch 
+ 011B  CD 21			         int 21h 
+ 011D				pseg     ends 
+				         end start 
+Microsoft (R) Macro Assembler Version 5.00                  11/21/4                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+PSEG . . . . . . . . . . . . . .  	011D	PARA	NONE	
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+SOUND  . . . . . . . . . . . . .  	L NEAR	0107	PSEG
+START  . . . . . . . . . . . . .  	L NEAR	0100	PSEG
+
+WAIT0  . . . . . . . . . . . . .  	L NEAR	0111	PSEG
+WAIT1  . . . . . . . . . . . . .  	L NEAR	010E	PSEG
+
+@FILENAME  . . . . . . . . . . .  	TEXT  p309		
+
+
+     23 Source  Lines
+     23 Total   Lines
+      7 Symbols
+
+  50414 + 450482 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

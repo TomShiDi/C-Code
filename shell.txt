@@ -1,0 +1,127 @@
+比如比较字符串、判断文件是否存在及是否可读等，通常用"[]"来表示条件测试。
+
+注意：这里的空格很重要。要确保方括号的空格。笔者就曾因为空格缺少或位置不对，而浪费好多宝贵的时间。
+
+if ....; then
+....
+elif ....; then
+....
+else
+....
+fi
+[ -f "somefile" ] ：判断是否是一个文件
+[ -x "/bin/ls" ] ：判断/bin/ls是否存在并有可执行权限
+[ -n "$var" ] ：判断$var变量是否有值
+[ "$a" = "$b" ] ：判断$a和$b是否相等
+-r file　　　　　用户可读为真
+-w file　　　　　用户可写为真
+-x file　　　　　用户可执行为真
+-f file　　　　　文件为正规文件为真
+-d file　　　　　文件为目录为真
+-c file　　　　　文件为字符特殊文件为真
+-b file　　　　　文件为块特殊文件为真
+-s file　　　　　文件大小非0时为真
+-t file　　　　　当文件描述符(默认为1)指定的设备为终端时为真
+含条件选择的shell脚本 对于不含变量的任务简单shell脚本一般能胜任。但在执行一些决策任务时，就需要包含if/then的条件判断了。shell脚本编程支持此类运算，包括比较运算、判断文件是否存在等。
+基本的if条件命令选项有： - eq —比较两个参数是否相等（例如，if [ 2 –eq 5 ]）
+-ne —比较两个参数是否不相等
+-lt —参数1是否小于参数2
+-le —参数1是否小于等于参数2
+-gt —参数1是否大于参数2
+-ge —参数1是否大于等于参数2
+-f — 检查某文件是否存在（例如，if [ -f "filename" ]）
+-d — 检查目录是否存在
+
+
+
+
+
+
+
+1)Unix 命令:
+
+　　虽然在shell脚本中可以使用任意的unix命令，但是还是由一些相对更常用的命令。这些命令通常是用来进行文件和文字操作的。
+
+常用命令语法及功能 
+　　echo "some text": 将文字内容打印在屏幕上 
+　　ls: 文件列表 
+　　wc –l filewc -w filewc -c file: 计算文件行数计算文件中的单词数计算文件中的字符数 
+　　cp sourcefile destfile: 文件拷贝 
+　　mv oldname newname : 重命名文件或移动文件 
+　　rm file: 删除文件 
+　　grep 'pattern' file: 在文件内搜索字符串比如：grep 'searchstring' file.txt 
+　　cut -b colnum file: 指定欲显示的文件内容范围，并将它们输出到标准输出设备比如：输出每行第5个到第9个字符cut -b5-9 file.txt千万不要和cat命令混淆，这是两个完全不同的命令
+　　cat file.txt: 输出文件内容到标准输出设备（屏幕）上 
+　　file somefile: 得到文件类型 
+　　read var: 提示用户输入，并将输入赋值给变量 
+　　sort file.txt: 对file.txt文件中的行进行排序 
+　　uniq: 删除文本文件中出现的行列比如： sort file.txt | uniq 
+　　expr: 进行数学运算Example: add 2 and 3expr 2 "+" 3 
+　　find: 搜索文件比如：根据文件名搜索find . -name filename -print 
+　　tee: 将数据输出到标准输出设备(屏幕) 和文件比如：somecommand | tee outfile 
+　　basename file: 返回不包含路径的文件名比如： basename /bin/tux将返回 tux 
+　　dirname file: 返回文件所在路径比如：dirname /bin/tux将返回 /bin 
+　　head file: 打印文本文件开头几行 
+　　tail file : 打印文本文件末尾几行 
+　　sed: Sed是一个基本的查找替换程序。可以从标准输入（比如命令管道）读入文本，并将结果输出到标准输出（屏幕）。该命令采用正则表达式（见参考）进行搜索。不要和shell中的通配符相混淆。比如：将linuxfocus 替换为LinuxFocus ：cat text.file | sed 's/linuxfocus/LinuxFocus/' > newtext.file。 如果要使用扩展变量则使用双引号，比如 sed "s/number ${num}/number ${num}th/".
+　　awk: awk 用来从文本文件中提取字段。缺省地，字段分割符是空格，可以使用-F指定其他分割符。 cat file.txt | awk -F, '{print $1 "," $3 }'这里我们使用，作为字段分割符，同时打印第一个和第三个字段。如果该文件内容如下： Adam Bor, 34, IndiaKerry Miller, 22, USA 命令输出结果为：Adam Bor, IndiaKerry Miller, USA
+
+
+2) 概念: 管道, 重定向和 backtick
+
+　　这些不是系统命令，但是他们真的很重要。
+
+　　管道 (|) 将一个命令的输出作为另外一个命令的输入.
+
+    grep "hello" file.txt | wc -l 
+　　在file.txt中搜索包含有”hello”的行并计算其行数。在这里grep命令的输出作为wc命令的输入。当然您可以使用多个命令。
+
+　　重定向：将命令的结果输出到文件，而不是标准输出（屏幕）。
+
+　　> 写入文件并覆盖旧文件
+
+　　>> 加到文件的尾部，保留旧文件内容。
+
+    反短斜线
+
+　 使用反短斜线( ` )可以将一个命令的输出作为另外一个命令的一个命令行参数。
+
+   命令：find . -mtime -1 -type f -print 
+　　用来查找过去24小时（-mtime –2则表示过去48小时）内修改过的文件。如果您想将所有查找到的文件打一个包，则可以使用以下脚本：
+
+
+
+
+read命令作用：
+
+从标准输入中读取一行，并把输入行的每个字段的值指定给shell变量
+
+参数：
+-a 后跟一个变量，该变量会被认为是个数组，然后给其赋值，默认是以空格为分割符。
+-d 后面跟一个标志符，其实只有其后的第一个字符有用，作为结束的标志，会举例说  明。
+-p 后面跟提示信息，即在输入前打印提示信息。
+-e 在输入的时候可以时候命令补全功能。
+-n 后跟一个数字，定义输入文本的长度，很实用。
+-r 屏蔽，如果没有该选项，则作为一个转义字符，有的话 就是个正常的字符了。
+-s 安静模式，在输入字符时不再屏幕上显示，例如login时输入密码。
+-t 后面跟秒数，定义输入字符的等待时间。
+-u 后面跟fd，从文件描述符中读入，该文件描述符可以是exec新开启的。
+
+
+
+
+自定义shell改变父shell的工作路径方法
+方法一：在父shell执行source xxxxx.sh
+方法二：. ./xxxxxx.sh 
+
+
+
+第一种命令行方式，如:
+
+ 
+
+awk [-Field-separator] 'commands' input-file(s)
+
+ 
+
+这里commands是真正的awk命令，[-F域分隔符]是可选的，awk默认使用空格分隔，因此如果要浏览域间有空格的文本，不必指定这个选项，但如果浏览如passwd文件，此文件各域使用冒号作为分隔符，则必须使用-F选项:   awk -F : 'commands' input-file

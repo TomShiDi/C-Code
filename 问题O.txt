@@ -1,0 +1,39 @@
+#include<stdio.h>
+int main()
+{
+	long int i;
+	int a[4]={0};
+	int qiuhe(long int x);
+	while(scanf("%d%d%d%d",&a[0],&a[1],&a[2],&a[3])!=EOF)
+	{
+		for(i=1;i<1000000000;i++)
+		{
+			if(i==(qiuhe(i)+a[0])*(qiuhe(i)+a[1])*(qiuhe(i)+a[2])*(qiuhe(i)+a[3]))
+			{
+				printf("%d\n",i);
+				break;
+			}
+		}
+		if(i==1000000000)
+		    printf("no\n");
+	}
+	return 0;
+}
+int qiuhe(long int x)
+{
+	int a[20]={0,0,0,0,0,0,0,0,0,0,0},s=0,yu,i=0;
+	while(1)
+	{
+		yu=x%10;
+		a[i]=yu;
+		x=x/10;
+		if(x==0)
+			break;
+		i++;
+	}
+	for(i=0;i<10;i++)
+		s=s+a[i];
+	return s;
+}
+
+		

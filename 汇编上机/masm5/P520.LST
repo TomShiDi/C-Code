@@ -1,0 +1,173 @@
+Microsoft (R) Macro Assembler Version 5.00                  11/30/4                                                             Page     1-1
+
+
+				;BIOS指令读磁盘， 
+				; 
+ 0000				cseg    segment para 'code' 
+				        assume cs:cseg,ds:cseg,ss:cseg,es:cseg 
+ 0100				        org 100h 
+ 0100  E9 031D R		begin:  jmp main 
+				;---------------------------- 
+ 0103  0200[			recdin  db 512 dup(' ') 
+	   20			
+			 ]	
+				
+ 0303  00			endcde  db 0 
+ 0304  0304			curadr  dw 0304h	;开始磁道、扇区 
+ 0306  0501			endadr  dw 0501h	;结束磁道、扇区 
+ 0308  2A 2A 2A 2A 20 72 65	redmsg  db '**** read error ***$' 
+       61 64 20 65 72 72 6F	
+       72 20 2A 2A 2A 24	
+ 031C  00			side    db 0 
+				;------------------------------------------- 
+ 031D  B8 ---- R		main:   mov ax,cseg 
+ 0320  8E D8			        mov ds,ax 
+ 0322  8E C0			        mov es,ax 
+ 0324  B8 0600			        mov ax,600h 
+ 0327  E8 03A7 R		repeat: call scren 
+ 032A  E8 03B5 R		        call curs 
+ 032D  E8 0354 R		        call addrs	;计算下一个磁盘扇区地址
+				 
+ 0330  8B 0E 0304 R		        mov cx,curadr 
+ 0334  8B 16 0306 R		        mov dx,endadr 
+ 0338  3B CA			        cmp cx,dx 
+ 033A  74 13			        je exit 
+ 033C  E8 0372 R		        call reads	;读磁盘扇区 
+ 033F  80 3E 0303 R 00		        cmp endcde,0 
+ 0344  75 09			        jnz exit 
+ 0346  E8 0398 R		        call disps	;显示 
+ 0349  B4 07			        mov ah,7 
+ 034B  CD 21			        int 21h 
+ 034D  EB D8			        jmp repeat 
+				; 
+ 034F  B8 4C00			exit:   mov ax,4c00h 
+ 0352  CD 21			        int 21h 
+				;--------------------------------------------- 
+ 0354				addrs   proc 
+ 0354  8B 0E 0304 R		        mov cx,curadr 
+ 0358  80 F9 13			        cmp cl,19 
+ 035B  75 14			        jne return 
+ 035D  80 3E 031C R 00		        cmp side,0 
+ 0362  74 02			        je chs 
+ 0364  FE C5			        inc ch 
+ 0366  80 36 031C R 01		chs:    xor side,01 
+ 036B  B1 01			        mov cl,1 
+ 036D  89 0E 0304 R		        mov curadr,cx 
+ 0371  C3			return: ret 
+ 0372				addrs   endp 
+Microsoft (R) Macro Assembler Version 5.00                  11/30/4                                                             Page     1-2
+
+
+				;----------------------------------------------
+				- 
+ 0372				reads   proc 
+ 0372  B0 01			        mov al,1 
+ 0374  B4 02			        mov ah,2 
+ 0376  8D 1E 0103 R		        lea bx,recdin 
+ 037A  8B 0E 0304 R		        mov cx,curadr 
+ 037E  8A 36 031C R		        mov dh,side 
+ 0382  B2 00			        mov dl,0 
+ 0384  CD 13			        int 13h 
+ 0386  80 FC 00			        cmp ah,0 
+ 0389  74 08			        jz incrt 
+ 038B  C6 06 0303 R 01		        mov endcde,1 
+ 0390  E8 03BF R		        call errm 
+ 0393  FF 06 0304 R		incrt:  inc curadr 
+ 0397  C3			        ret 
+ 0398				reads   endp 
+				;----------------------------------------------
+				- 
+ 0398				disps   proc 
+ 0398  B4 40			        mov ah,40h 
+ 039A  BB 0001			        mov bx,1 
+ 039D  B9 0200			        mov cx,512 
+ 03A0  8D 16 0103 R		        lea dx,recdin 
+ 03A4  CD 21			        int 21h 
+ 03A6  C3			        ret 
+ 03A7				disps   endp 
+				;--------------------------------------------- 
+ 03A7				scren   proc 
+ 03A7  B8 0600			        mov ax,600h 
+ 03AA  B7 1E			        mov bh,1eh 
+ 03AC  B9 0000			        mov cx,0 
+ 03AF  BA 184F			        mov dx,184fh 
+ 03B2  CD 10			        int 10h 
+ 03B4  C3			        ret 
+ 03B5				scren   endp 
+				;----------------------------------------------
+				- 
+ 03B5				curs    proc 
+ 03B5  B4 02			        mov ah,2 
+ 03B7  B7 00			        mov bh,0 
+ 03B9  BA 0000			        mov dx,0 
+ 03BC  CD 10			        int 10h 
+ 03BE  C3			        ret 
+ 03BF				curs    endp 
+				;----------------------------------------------
+				--- 
+ 03BF				errm    proc 
+ 03BF  B4 40			        mov ah,40h 
+ 03C1  BB 0001			        mov bx,1 
+ 03C4  B9 0014			        mov cx,20 
+ 03C7  8D 16 0308 R		        lea dx,redmsg 
+ 03CB  CD 21			        int 21h 
+ 03CD  C3			        ret 
+Microsoft (R) Macro Assembler Version 5.00                  11/30/4                                                             Page     1-3
+
+
+ 03CE				errm    endp 
+				;------------------------------------------- 
+ 03CE				cseg    ends 
+				        end begin 
+Microsoft (R) Macro Assembler Version 5.00                  11/30/4                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+CSEG . . . . . . . . . . . . . .  	03CE	PARA	NONE	'CODE'
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+ADDRS  . . . . . . . . . . . . .  	N PROC	0354	CSEG	Length = 001E
+
+BEGIN  . . . . . . . . . . . . .  	L NEAR	0100	CSEG
+
+CHS  . . . . . . . . . . . . . .  	L NEAR	0366	CSEG
+CURADR . . . . . . . . . . . . .  	L WORD	0304	CSEG
+CURS . . . . . . . . . . . . . .  	N PROC	03B5	CSEG	Length = 000A
+
+DISPS  . . . . . . . . . . . . .  	N PROC	0398	CSEG	Length = 000F
+
+ENDADR . . . . . . . . . . . . .  	L WORD	0306	CSEG
+ENDCDE . . . . . . . . . . . . .  	L BYTE	0303	CSEG
+ERRM . . . . . . . . . . . . . .  	N PROC	03BF	CSEG	Length = 000F
+EXIT . . . . . . . . . . . . . .  	L NEAR	034F	CSEG
+
+INCRT  . . . . . . . . . . . . .  	L NEAR	0393	CSEG
+
+MAIN . . . . . . . . . . . . . .  	L NEAR	031D	CSEG
+
+READS  . . . . . . . . . . . . .  	N PROC	0372	CSEG	Length = 0026
+RECDIN . . . . . . . . . . . . .  	L BYTE	0103	CSEG	Length = 0200
+REDMSG . . . . . . . . . . . . .  	L BYTE	0308	CSEG
+REPEAT . . . . . . . . . . . . .  	L NEAR	0327	CSEG
+RETURN . . . . . . . . . . . . .  	L NEAR	0371	CSEG
+
+SCREN  . . . . . . . . . . . . .  	N PROC	03A7	CSEG	Length = 000E
+SIDE . . . . . . . . . . . . . .  	L BYTE	031C	CSEG
+
+@FILENAME  . . . . . . . . . . .  	TEXT  p520		
+
+
+    102 Source  Lines
+    102 Total   Lines
+     23 Symbols
+
+  50408 + 450600 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

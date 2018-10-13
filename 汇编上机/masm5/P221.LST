@@ -1,0 +1,138 @@
+Microsoft (R) Macro Assembler Version 5.00                  11/7/4                                                             Page     1-1
+
+
+				;p221.asm数组元素相加送结果单元子程序。 
+				;通过堆栈传送参数。 
+				;通过debug分析堆栈变化。 
+				;************************************* 
+ 0000				parmseg segment 
+ 0000  0032[			ary	dw	50 dup(1,2) 
+	   0001			
+	   0002			
+			 ]	
+				
+ 00C8  0064			count	dw	100 
+ 00CA  ????			sum	dw	? 
+ 00CC				parmseg	ends 
+				;************************************* 
+				; 
+				;************************************* 
+ 0000				stack	segment 
+ 0000  0064[				dw  	100  dup(?) 
+	   ????			
+			 ]	
+				
+ 00C8				tos	label	word		;栈顶，向上发展
+				。 
+ 00C8				stack	ends 
+				;************************************** 
+				; 
+				;************************************** 
+ 0000				code1	segment 
+					assume	cs:code1,ds:parmseg,ss:stack 
+ 0100					org	100h 
+				; 
+ 0100				main	proc	far 
+ 0100  B8 ---- R		start:	mov	ax,stack 
+ 0103  8E D0				mov	ss,ax 
+ 0105  BC 00C8 R			mov	sp,offset  tos	;设置堆栈段 
+				; 
+ 0108  1E				push	ds 
+ 0109  2B C0				sub	ax,ax 
+ 010B  50				push	ax 
+				; 
+ 010C  B8 ---- R			mov	ax,parmseg 
+ 010F  8E D8				mov	ds,ax		;上五行固定模式
+				 
+				; 
+ 0111  BB 0000 R			mov	bx,offset ary	;压数组首址 
+ 0114  53				push	bx 
+ 0115  BB 00C8 R			mov	bx,offset count	;压元素个数地址
+				 
+ 0118  53				push	bx 
+ 0119  BB 00CA R			mov	bx,offset sum	;压结果单元地址
+				 
+ 011C  53				push	bx 
+ 011D  9A 0000 ---- R			call	far ptr proadd 
+ 0122  CB				ret 
+Microsoft (R) Macro Assembler Version 5.00                  11/7/4                                                             Page     1-2
+
+
+ 0123				main	endp 
+				; 
+ 0123				code1	ends 
+				;************************************** 
+				; 
+				;************************************** 
+ 0000				code2	segment 
+					assume	cs:code2 
+				;	 
+ 0000				proadd	proc	far 
+ 0000  55				push	bp 
+ 0001  8B EC				mov	bp,sp 
+ 0003  50				push	ax 
+ 0004  51				push	cx 
+ 0005  56				push	si 
+ 0006  57				push	di 
+ 0007  8B 76 0A				mov	si,[bp+0ah]	;见图6.2 
+ 000A  8B 7E 08				mov	di,[bp+8] 
+ 000D  8B 0D				mov	cx,[di] 
+ 000F  8B 7E 06				mov	di,[bp+6] 
+ 0012  33 C0				xor	ax,ax 
+ 0014  03 04			next:	add	ax,[si] 
+ 0016  83 C6 02				add	si,2	 
+ 0019  E2 F9				loop	next 
+ 001B  89 05				mov	[di],ax 
+ 001D  5F				pop	di 
+ 001E  5E				pop	si 
+ 001F  59				pop	cx 
+ 0020  58				pop	ax 
+ 0021  5D				pop	bp 
+ 0022  CA 0006				ret	6 
+ 0025				proadd	endp 
+				; 
+ 0025				code2	ends 
+				;***************************************** 
+					end	start 
+Microsoft (R) Macro Assembler Version 5.00                  11/7/4                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+CODE1  . . . . . . . . . . . . .  	0123	PARA	NONE	
+CODE2  . . . . . . . . . . . . .  	0025	PARA	NONE	
+PARMSEG  . . . . . . . . . . . .  	00CC	PARA	NONE	
+STACK  . . . . . . . . . . . . .  	00C8	PARA	NONE	
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+ARY  . . . . . . . . . . . . . .  	L WORD	0000	PARMSEG	Length = 0032
+
+COUNT  . . . . . . . . . . . . .  	L WORD	00C8	PARMSEG
+
+MAIN . . . . . . . . . . . . . .  	F PROC	0100	CODE1	Length = 0023
+
+NEXT . . . . . . . . . . . . . .  	L NEAR	0014	CODE2
+
+PROADD . . . . . . . . . . . . .  	F PROC	0000	CODE2	Length = 0025
+
+START  . . . . . . . . . . . . .  	L NEAR	0100	CODE1
+SUM  . . . . . . . . . . . . . .  	L WORD	00CA	PARMSEG
+
+TOS  . . . . . . . . . . . . . .  	L WORD	00C8	STACK
+
+@FILENAME  . . . . . . . . . . .  	TEXT  p221		
+
+
+     79 Source  Lines
+     79 Total   Lines
+     14 Symbols
+
+  50256 + 450752 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

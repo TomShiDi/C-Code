@@ -1,0 +1,74 @@
+Microsoft (R) Macro Assembler Version 5.00                  11/14/4                                                             Page     1-1
+
+
+				;p206.asm,字节表中数据移入字表对应元素高字节。 
+				;比例因子变址方式，数据段紧跟代码段。 
+				;在004ccd21H(mov ax,4c00H/int 21H)后 
+					.model	small 
+					.386 
+ 0200					.stack	200H 
+ 0000					.data 
+ 0000  0014[			byte_ta	db	20 dup(17) 
+	   11			
+			 ]	
+				
+ 0014  0014[			word_ta	dw	20 dup(202h) 
+	   0202			
+			 ]	
+				
+ 0000					.code 
+ 0000  B8 ---- R		start:	mov	ax,@data 
+ 0003  8E D8				mov	ds,ax			;固定模
+				式 
+				; 
+ 0005  66| 33 F6			xor	esi,esi 
+ 0008  67| 8B 0475 00000014	next:	mov	ax,word_ta[esi*2] 
+	R			
+ 0010  67| 8A A6 00000000 R		mov	ah,byte_ta[esi] 
+ 0017  67| 89 0475 00000014		mov	word_ta[esi*2],ax 
+	R			
+ 001F  66| 46				inc	esi 
+ 0021  66| 83 FE 14			cmp	esi,20 
+ 0025  7C E1				jl	next 
+				; 
+ 0027  B8 4C00				mov	ax,4c00H 
+ 002A  CD 21				int	21H 
+ 002C					end	start 
+Microsoft (R) Macro Assembler Version 5.00                  11/14/4                                                             Symbols-1
+
+
+
+
+                N a m e         	Size	Length	 Align	Combine Class
+
+DGROUP . . . . . . . . . . . . .  	GROUP
+  _DATA  . . . . . . . . . . . .  	16 Bit	003C	WORD	PUBLIC	'DATA'
+  STACK  . . . . . . . . . . . .  	16 Bit	0200	PARA	STACK	'STACK'
+_TEXT  . . . . . . . . . . . . .  	16 Bit	002C	WORD	PUBLIC	'CODE'
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+BYTE_TA  . . . . . . . . . . . .  	L BYTE	0000	_DATA	Length = 0014
+
+NEXT . . . . . . . . . . . . . .  	L NEAR	0008	_TEXT
+
+START  . . . . . . . . . . . . .  	L NEAR	0000	_TEXT
+
+WORD_TA  . . . . . . . . . . . .  	L WORD	0014	_DATA	Length = 0014
+
+@CODE  . . . . . . . . . . . . .  	TEXT  _TEXT		
+@CODESIZE  . . . . . . . . . . .  	TEXT  0		
+@DATASIZE  . . . . . . . . . . .  	TEXT  0		
+@FILENAME  . . . . . . . . . . .  	TEXT  p206		
+
+
+     24 Source  Lines
+     24 Total   Lines
+     18 Symbols
+
+  50132 + 450764 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

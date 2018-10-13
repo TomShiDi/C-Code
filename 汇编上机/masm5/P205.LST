@@ -1,0 +1,76 @@
+Microsoft (R) Macro Assembler Version 5.00                  10/31/4                                                             Page     1-1
+
+
+				;p205.asm,字节表中数据移入字表对应元素高字节。 
+				;一般寻址方式 
+					.model	small 
+					.386 
+ 0200					.stack	200H 
+					 
+ 0000					.data 
+					align	16 
+ 0000  0014[			byte_ta	db	20 dup(?) 
+	    ??			
+			 ]	
+				
+				 
+ 0014  0014[			word_ta	dw	20 dup(?) 
+	   ????			
+			 ]	
+				
+ 0000					.code 
+ 0000  B8 ---- R		start:	mov	ax,@data 
+ 0003  8E D8				mov	ds,ax			;固定模
+				式 
+				; 
+ 0005  33 F6				xor	si,si 
+ 0007  33 FF				xor	di,di 
+ 0009  8B 85 0014 R		next:	mov	ax,word_ta[di] 
+ 000D  8A A4 0000 R			mov	ah,byte_ta[si] 
+ 0011  89 85 0014 R			mov	word_ta[di],ax 
+ 0015  46				inc	si 
+ 0016  83 C7 02				add	di,2 
+ 0019  83 FE 14				cmp	si,20 
+ 001C  7C EB				jl	next 
+				; 
+ 001E  B8 4C00				mov	ax,4c00H 
+ 0021  CD 21				int	21H 
+ 0023					end	start 
+Microsoft (R) Macro Assembler Version 5.00                  10/31/4                                                             Symbols-1
+
+
+
+
+                N a m e         	Size	Length	 Align	Combine Class
+
+DGROUP . . . . . . . . . . . . .  	GROUP
+  _DATA  . . . . . . . . . . . .  	16 Bit	003C	WORD	PUBLIC	'DATA'
+  STACK  . . . . . . . . . . . .  	16 Bit	0200	PARA	STACK	'STACK'
+_TEXT  . . . . . . . . . . . . .  	16 Bit	0023	WORD	PUBLIC	'CODE'
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+BYTE_TA  . . . . . . . . . . . .  	L BYTE	0000	_DATA	Length = 0014
+
+NEXT . . . . . . . . . . . . . .  	L NEAR	0009	_TEXT
+
+START  . . . . . . . . . . . . .  	L NEAR	0000	_TEXT
+
+WORD_TA  . . . . . . . . . . . .  	L WORD	0014	_DATA	Length = 0014
+
+@CODE  . . . . . . . . . . . . .  	TEXT  _TEXT		
+@CODESIZE  . . . . . . . . . . .  	TEXT  0		
+@DATASIZE  . . . . . . . . . . .  	TEXT  0		
+@FILENAME  . . . . . . . . . . .  	TEXT  p205		
+
+
+     28 Source  Lines
+     28 Total   Lines
+     18 Symbols
+
+  50208 + 450688 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

@@ -1,0 +1,89 @@
+Microsoft (R) Macro Assembler Version 5.00                  10/23/4                                                             Page     1-1
+
+
+				;p183.asm,逻辑尺计算向量运算 
+				;******************************************* 
+ 0000				data	segment 
+ 0000  0001 0003 0005 0007	x	dw	1,3,5,7,9,11,13,15,17,19,21,23,
+				25,27,29,31 
+       0009 000B 000D 000F	
+       0011 0013 0015 0017	
+       0019 001B 001D 001F	
+ 0020  0002 0004 0006 0008	y	dw	2,4,6,8,10,12,14,16,18,20,22,24
+				,26,28,30,32 
+       000A 000C 000E 0010	
+       0012 0014 0016 0018	
+       001A 001C 001E 0020	
+ 0040  0010[			z	dw	16 dup (?) 
+	   ????			
+			 ]	
+				
+ 0060  00DC			logic_r	dw	00DCH 
+ 0062				data	ends 
+				;******************************************* 
+ 0000				program	segment 
+ 0000				main	proc	far 
+					assume	cs:program,ds:data 
+ 0000  1E			start:	push 	ds 
+ 0001  2B C0				sub	ax,ax 
+ 0003  50				push	ax 
+ 0004  B8 ---- R			mov	ax,data 
+ 0007  8E D8				mov	ds,ax 
+ 0009  BB 0000				mov	bx,0 
+ 000C  B9 000A				mov 	cx,10 
+ 000F  8B 16 0060 R			mov	dx,logic_r 
+ 0013  8B 87 0000 R		next:	mov	ax,x[bx] 
+ 0017  D1 EA				shr	dx,1 
+ 0019  72 06				jc	subtra 
+ 001B  03 87 0020 R			add	ax,y[bx] 
+ 001F  EB 04				jmp	short result 
+ 0021  2B 87 0020 R		subtra:	sub	ax,y[bx] 
+ 0025  89 87 0040 R		result:	mov	z[bx],ax 
+ 0029  83 C3 02				add	bx,2 
+ 002C  E2 E5				loop	next 
+ 002E  CB				ret 
+ 002F				main	endp 
+ 002F				program	ends 
+					end start 
+Microsoft (R) Macro Assembler Version 5.00                  10/23/4                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+DATA . . . . . . . . . . . . . .  	0062	PARA	NONE	
+PROGRAM  . . . . . . . . . . . .  	002F	PARA	NONE	
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+LOGIC_R  . . . . . . . . . . . .  	L WORD	0060	DATA
+
+MAIN . . . . . . . . . . . . . .  	F PROC	0000	PROGRAM	Length = 002F
+
+NEXT . . . . . . . . . . . . . .  	L NEAR	0013	PROGRAM
+
+RESULT . . . . . . . . . . . . .  	L NEAR	0025	PROGRAM
+
+START  . . . . . . . . . . . . .  	L NEAR	0000	PROGRAM
+SUBTRA . . . . . . . . . . . . .  	L NEAR	0021	PROGRAM
+
+X  . . . . . . . . . . . . . . .  	L WORD	0000	DATA
+
+Y  . . . . . . . . . . . . . . .  	L WORD	0020	DATA
+
+Z  . . . . . . . . . . . . . . .  	L WORD	0040	DATA	Length = 0010
+
+@FILENAME  . . . . . . . . . . .  	TEXT  p183		
+
+
+     33 Source  Lines
+     33 Total   Lines
+     13 Symbols
+
+  50254 + 450754 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

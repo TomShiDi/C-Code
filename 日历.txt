@@ -1,0 +1,81 @@
+#include<stdio.h>
+int main()
+{
+	int i,year,s,j,yushu;
+	int yunnianshu(int year);
+	int panduanyunnian(int year);
+	char w[255]="*Mon Tue Web Thu Fri Sat Sun";
+	char a[255]="   1   2   3   4   5   6   7\n   8   9  10  11  12  13  14\n  15  16  17  18  19  20  21\n  22  23  24  25  26  27  28\n  29  30  31";
+	char b[255]="   1   2   3   4   5   6   7\n   8   9  10  11  12  13  14\n  15  16  17  18  19  20  21\n  22  23  24  25  26  27  28\n  29";
+	char c[255]="   1   2   3   4   5   6   7\n   8   9  10  11  12  13  14\n  15  16  17  18  19  20  21\n  22  23  24  25  26  27  28";
+	scanf("%d",&year);
+	s=0;
+	if(year%4==0&&year%100!=0)
+		s=1;
+	if(year%400==0)
+		s=1;
+	yushu=(365*(year-1970)+yunnianshu(year)-151)%7;
+	for(i=1;i<=12;i++)
+	{
+		if(i%2==1)
+			yushu=(yushu+31)%7;
+		else
+		{
+		    if(i==2&&s==1)
+			    yushu=(yushu+29)%7;
+			if(i==2&&s==0)
+			    yushu=(yushu+28)%7;
+			if(i!=2)
+				yushu=(yushu+30)%7;
+		}
+		if(i==2)
+		{
+			if(s==1)
+			{
+			    puts(w);
+				for(j=0;j<yushu;j++)
+					printf("    ");
+                puts(b);
+			}
+			else
+			{
+				puts(w);
+				for(j=0;j<yushu;j++)
+					printf("    ");
+				puts(c);
+			}
+			
+	}
+        
+		puts(w);
+		for(j=0;j<yushu;j++)
+			printf("    ");
+		puts(a);
+	}
+	return 0;
+}
+int yunnianshu(int year)
+{
+	int i,n;
+	for(i=1970;i<year;i++)
+	{
+		if(i%4==0&&i%100!=0)
+			n++;
+		if(i%400==0)
+			n++;
+	}
+	return n;
+}
+
+int panduanyunnian(int year)
+{
+	int n=0;
+	if(year%4==0&&year%100!=0)
+		n=1;
+	if(year%400==0)
+		n=1;
+	return n;
+}
+
+
+

@@ -1,0 +1,202 @@
+Microsoft (R) Macro Assembler Version 5.00                  11/21/4                                                             Page     1-1
+
+
+				;p253.asm £¬Î»´®²åÈë£ºÐ¡ÓÚ32Î»µÄÎ»´®²åÈë´æ´¢Æ÷Ö
+				Ð´óÎ»´®ÖÐ¡£ 
+				;Òª²åÈëÎ»´®ÔÚbitsgÖÐ£¬ÎªÓÒ¶ÔÆëÎ»´®£¬³¤¶ÈÓÉ·ûºÅ³
+				£Êýbigsg_lÖ¸¶¨¡£ 
+				;´óÎ»´®ÔÚstringÖÐ£¬²¢ÎªÒª²åÈëµÄ×Ó´®×¼±¸ÁËsg_end
+				µÄË«×Öµ¥Ôª¡£ 
+				;½«bitsg_l¸ÄÎª16¡¢bit_off¸ÄÎª60ÊÇÎªÁËÈÝÒ×¶Ô±È¡£
+				 
+				; 
+				;**********************************************
+				*********** 
+				; 
+					.model	small 
+					.386 
+ 0200					.stack	200h 
+				; 
+				;**********************************************
+				*********** 
+				; 
+ = 0010					bitsg_l=16 
+				; 
+				;**********************************************
+				*********** 
+				; 
+ 0000					.data 
+					align	16 
+ 0000  FF7F0000			bitsg	dd	7fffh 
+ 0004  78563412785634127856	string	dd	12345678h,12345678h,12345678h,1
+				2345678h 
+       341278563412		
+ 0014  ????????			sg_end	dd	? 
+ 0018  3C000000			bit_off	dd	60 
+				; 
+				;**********************************************
+				*********** 
+				; 
+ 0000					.code 
+				;----------------------------------------------
+				----------- 
+ 0000  B8 ---- R		start:	mov	ax,@data 
+ 0003  8E D8				mov	ds,ax 
+ 0005  8E C0				mov	es,ax 
+				; 
+ 0007  B9 0010				mov	cx,bitsg_l 
+ 000A  83 F9 00				cmp	cx,0 
+ 000D  0F 84 0045 R			je	exit 
+ 0011  83 F9 20				cmp	cx,32 
+ 0014  0F 83 0045 R			jae	exit 
+ 0018  66| 8B 3E 0018 R			mov	edi,bit_off 
+ 001D  66| B9 00000004			mov	ecx,(sg_end-string)/4 
+ 0023  66| C1 E1 05			shl	ecx,5 
+ 0027  66| 3B F9			cmp	edi,ecx 
+ 002A  0F 87 0045 R			ja	exit 
+ 002E  0F 82 003F R			jb	move 
+Microsoft (R) Macro Assembler Version 5.00                  11/21/4                                                             Page     1-2
+
+
+ 0032  66| 8B 36 0000 R			mov	esi,bitsg 
+ 0037  66| 89 36 0014 R			mov	sg_end,esi 
+ 003C  EB 07 90				jmp	exit 
+				; 
+ 003F  E8 004A R		move:	call 	mov_str 
+ 0042  E8 00A6 R			call	insert 
+				; 
+ 0045  B8 4C00			exit:	mov	ax,4c00h 
+ 0048  CD 21				int 	21h 
+				;----------------------------------------------
+				------------- 
+				; 
+				;----------------------------------------------
+				------------- 
+				;¹ý³ÌÃû£ºmov_str 
+				;¹¦ÄÜ£»ÔÚ´óÎ»´®ÖÐÓÉbit_offÖ¸¶¨Î»ÖÃ×ó·½³¤¶ÈÎªbit
+				sg_lÎ»×óÒÆ¡£ 
+				;Èë¿Ú²ÎÊý£º´óÎ»´®Ê×Ö·string£¬bit_off£¬bitsg_l 
+				;·µ»ØÖµ£ºÎÞ 
+				;Ëã·¨£ºÊ¹ÓÃ32Î»Ö¸Áî£¬Èçshld£¬stosdµÈ 
+ 004A				mov_str	proc	near 
+ 004A  66| 2B C0			sub	eax,eax 
+ 004D  FD				std 
+ 004E  BE 0010 R			mov	si,offset sg_end-4 
+ 0051  BF 0014 R			mov	di,offset sg_end 
+ 0054  66| B9 00000004			mov	ecx,(sg_end-string)/4 
+ 005A  66| 8B 1E 0018 R			mov	ebx,bit_off 
+ 005F  66| C1 EB 05			shr	ebx,5 
+ 0063  66| 2B CB			sub	ecx,ebx 
+				; 
+ 0066  66| 8B 1C		next:	mov	ebx,[si] 
+ 0069  66| 0F A4 D8 10			shld	eax,ebx,bitsg_l 
+ 006E  66| AB				stosd 
+ 0070  66| 8B C3			mov	eax,ebx 
+ 0073  83 EE 04				sub	si,4 
+ 0076  E2 EE				loop	next 
+ 0078  66| 2B DB			sub	ebx,ebx 
+ 007B  66| 2B D2			sub	edx,edx 
+ 007E  66| 8B 0E 0018 R			mov	ecx,bit_off 
+ 0083  80 E1 1F				and	cl,1fh 
+ 0086  66| 0F AD C3			shrd	ebx,eax,cl 
+ 008A  66| 0F A5 D8			shld	eax,ebx,cl 
+ 008E  66| C1 E0 10			shl	eax,bitsg_l 
+ 0092  66| BB FFFFFFFF			mov	ebx,-1 
+ 0098  66| D3 E3			shl	ebx,cl 
+ 009B  66| 23 C3			and	eax,ebx 
+ 009E  66| 0B C2			or	eax,edx 
+ 00A1  67| 66| 89 07			mov	[edi],eax 
+ 00A5  C3				ret 
+ 00A6				mov_str	endp 
+				; 
+				;----------------------------------------------
+				-------- 
+				;¹ý³ÌÃû£ºinsert 
+Microsoft (R) Macro Assembler Version 5.00                  11/21/4                                                             Page     1-3
+
+
+				;¹¦ÄÜ£º½«×Ó´®²åÈëmov_strÒÆ³öµÄ¿ÕÖÐ¡£ 
+				;Èë¿Ú²ÎÊý£º×Ó´®Ê×Ö·¡¢bit_off¡¢´óÎ»´®Ê×Ö·string£
+				¬bitsg_l 
+				;·µ»ØÖµ£ºÎÞ 
+				; 
+				; 
+ 00A6				insert	proc	near 
+ 00A6  66| 8B 36 0000 R			mov	esi,bitsg 
+ 00AB  66| 8B 3E 0018 R			mov	edi,bit_off 
+ 00B0  66| 8B CF			mov	ecx,edi 
+ 00B3  66| C1 EF 05			shr	edi,5 
+ 00B7  66| C1 E7 02			shl	edi,2 
+ 00BB  80 E1 1F				and	cl,1fh 
+ 00BE  66| A1 0004 R			mov	eax,string 
+ 00C2  67| 66| 8B 97 00000008		mov	edx,string+4[edi] 
+	R			
+ 00CA  66| 8B D8			mov	ebx,eax 
+ 00CD  66| 0F AD D0			shrd	eax,edx,cl 
+ 00D1  66| 0F AD DA			shrd	edx,ebx,cl 
+ 00D5  66| 0F AC F0 10			shrd	eax,esi,bitsg_l 
+ 00DA  66| C1 C0 10			rol	eax,bitsg_l 
+ 00DE  66| 8B D8			mov	ebx,eax 
+ 00E1  66| 0F A5 D0			shld	eax,edx,cl 
+ 00E5  66| 0F A5 DA			shld	edx,ebx,cl 
+ 00E9  67| 66| 89 87 00000004		mov	string[edi],eax 
+	R			
+ 00F1  67| 66| 89 97 00000008		mov	string+4[edi],edx 
+	R			
+ 00F9  C3				ret	 
+ 00FA				insert	endp 
+				; 
+				;----------------------------------------------
+				------------ 
+				; 
+				;**********************************************
+				************* 
+				;	 
+ 00FA					end	start 
+Microsoft (R) Macro Assembler Version 5.00                  11/21/4                                                             Symbols-1
+
+
+
+
+                N a m e         	Size	Length	 Align	Combine Class
+
+DGROUP . . . . . . . . . . . . .  	GROUP
+  _DATA  . . . . . . . . . . . .  	16 Bit	001C	WORD	PUBLIC	'DATA'
+  STACK  . . . . . . . . . . . .  	16 Bit	0200	PARA	STACK	'STACK'
+_TEXT  . . . . . . . . . . . . .  	16 Bit	00FA	WORD	PUBLIC	'CODE'
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+BITSG  . . . . . . . . . . . . .  	L DWORD	0000	_DATA
+BITSG_L  . . . . . . . . . . . .  	NUMBER	0010	
+BIT_OFF  . . . . . . . . . . . .  	L DWORD	0018	_DATA
+
+EXIT . . . . . . . . . . . . . .  	L NEAR	0045	_TEXT
+
+INSERT . . . . . . . . . . . . .  	N PROC	00A6	_TEXT	Length = 0054
+
+MOVE . . . . . . . . . . . . . .  	L NEAR	003F	_TEXT
+MOV_STR  . . . . . . . . . . . .  	N PROC	004A	_TEXT	Length = 005C
+
+NEXT . . . . . . . . . . . . . .  	L NEAR	0066	_TEXT
+
+SG_END . . . . . . . . . . . . .  	L DWORD	0014	_DATA
+START  . . . . . . . . . . . . .  	L NEAR	0000	_TEXT
+STRING . . . . . . . . . . . . .  	L DWORD	0004	_DATA
+
+@CODE  . . . . . . . . . . . . .  	TEXT  _TEXT		
+@CODESIZE  . . . . . . . . . . .  	TEXT  0		
+@DATASIZE  . . . . . . . . . . .  	TEXT  0		
+@FILENAME  . . . . . . . . . . .  	TEXT  p253		
+
+
+    125 Source  Lines
+    125 Total   Lines
+     25 Symbols
+
+  49564 + 451444 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

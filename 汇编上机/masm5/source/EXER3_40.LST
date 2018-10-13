@@ -1,0 +1,98 @@
+Microsoft (R) Macro Assembler Version 5.00                  11/18/4                                                             Page     1-1
+
+
+				;exer3_40.asm,判断转移分支。 
+				;相应执行分支号存flag数组。 
+				; 
+ 0000				data	segment 
+ 0000  147B B568 42C8 D023	ary1	dw	147bh,0b568h,42c8h,0d023h,94b7h
+				 
+       94B7			
+ 000A  89DC 54B7 608D 9FD0	ary2	dw	89dch,54b7h,608dh,9fd0h,0b568h 
+       B568			
+ 0014  0005[			flag	dw	5 dup(?) 
+	   ????			
+			 ]	
+				
+ 001E				data	ends 
+				; 
+				; 
+ 0000				code	segment 
+					assume	cs:code,ds:data 
+ 0000  B8 ---- R		start:	mov	ax,data 
+ 0003  8E D8				mov 	ds,ax 
+				; 
+ 0005  BE 0000				mov	si,0 
+ 0008  B9 0005				mov	cx,5 
+ 000B  8B 84 0000 R		next:	mov	ax,ary1[si] 
+ 000F  03 84 000A R			add	ax,ary2[si] 
+ 0013  71 13				jno	l1 
+ 0015  73 1A				jnc	l2 
+ 0017  2B 84 000A R			sub	ax,ary2[si] 
+ 001B  73 1D				jnc	l3 
+ 001D  71 24				jno	l4 
+				; 
+ 001F  C7 84 0014 R 0005		mov	flag[si],5 
+ 0025  EB 22 90				jmp	continu 
+				; 
+ 0028  C7 84 0014 R 0001	l1:	mov	flag[si],1 
+ 002E  EB 19 90				jmp	continu 
+				; 
+ 0031  C7 84 0014 R 0002	l2:	mov	flag[si],2 
+ 0037  EB 10 90				jmp	continu 
+				; 
+ 003A  C7 84 0014 R 0003	l3:	mov	flag[si],3 
+ 0040  EB 07 90				jmp	continu 
+				; 
+ 0043  C7 84 0014 R 0004	l4:	mov	flag[si],4 
+				; 
+ 0049  46			continu:inc	si 
+ 004A  46				inc	si 
+ 004B  E2 BE				loop	next 
+				; 
+ 004D  B8 4C00				mov 	ax,4c00h 
+ 0050  CD 21				int	21h 
+				; 
+ 0052				code	ends 
+					end	start 
+Microsoft (R) Macro Assembler Version 5.00                  11/18/4                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+CODE . . . . . . . . . . . . . .  	0052	PARA	NONE	
+DATA . . . . . . . . . . . . . .  	001E	PARA	NONE	
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+ARY1 . . . . . . . . . . . . . .  	L WORD	0000	DATA
+ARY2 . . . . . . . . . . . . . .  	L WORD	000A	DATA
+
+CONTINU  . . . . . . . . . . . .  	L NEAR	0049	CODE
+
+FLAG . . . . . . . . . . . . . .  	L WORD	0014	DATA	Length = 0005
+
+L1 . . . . . . . . . . . . . . .  	L NEAR	0028	CODE
+L2 . . . . . . . . . . . . . . .  	L NEAR	0031	CODE
+L3 . . . . . . . . . . . . . . .  	L NEAR	003A	CODE
+L4 . . . . . . . . . . . . . . .  	L NEAR	0043	CODE
+
+NEXT . . . . . . . . . . . . . .  	L NEAR	000B	CODE
+
+START  . . . . . . . . . . . . .  	L NEAR	0000	CODE
+
+@FILENAME  . . . . . . . . . . .  	TEXT  exer3_40		
+
+
+     48 Source  Lines
+     48 Total   Lines
+     14 Symbols
+
+  50228 + 450780 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

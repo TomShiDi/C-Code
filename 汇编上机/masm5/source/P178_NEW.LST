@@ -1,0 +1,70 @@
+Microsoft (R) Macro Assembler Version 5.00                  10/22/4                                                             Page     1-1
+
+
+				;p178.asm,求变量Y中1的个数送count 
+				;********************************* 
+ 0000				data	segment 
+ 0000  0002 R			addr	dw	number 
+ 0002  ????			number	dw	? 
+ 0004  ????			count	dw	? 
+ 0006				data	ends 
+				;********************************* 
+ 0000				code	segment 
+					assume	cs:code,ds:data 
+ 0000				main	proc	far 
+ 0000  1E			start:	push	ds 
+ 0001  2B C0				sub	ax,ax 
+ 0003  50				push	ax 
+ 0004  BB ---- R			mov	bx,data 
+ 0007  8E DB				mov	ds,bx 
+ 0009  8B 1E 0000 R			mov	bx,addr 
+ 000D  8B 17				mov	dx,[bx] 
+ 000F  83 FA 00			repeat:	cmp	dx,0 
+ 0012  74 06				jz	exit 
+ 0014  D1 E2				shl	dx,1 
+ 0016  14 00				adc	al,0 
+ 0018  EB F5				jmp	repeat 
+ 001A  A3 0004 R		exit:	mov	count,ax 
+ 001D  CB				ret	 
+ 001E				main	endp 
+ 001E				code	ends 
+					end 	start 
+Microsoft (R) Macro Assembler Version 5.00                  10/22/4                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+CODE . . . . . . . . . . . . . .  	001E	PARA	NONE	
+DATA . . . . . . . . . . . . . .  	0006	PARA	NONE	
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+ADDR . . . . . . . . . . . . . .  	L WORD	0000	DATA
+
+COUNT  . . . . . . . . . . . . .  	L WORD	0004	DATA
+
+EXIT . . . . . . . . . . . . . .  	L NEAR	001A	CODE
+
+MAIN . . . . . . . . . . . . . .  	F PROC	0000	CODE	Length = 001E
+
+NUMBER . . . . . . . . . . . . .  	L WORD	0002	DATA
+
+REPEAT . . . . . . . . . . . . .  	L NEAR	000F	CODE
+
+START  . . . . . . . . . . . . .  	L NEAR	0000	CODE
+
+@FILENAME  . . . . . . . . . . .  	TEXT  p178_new		
+
+
+     28 Source  Lines
+     28 Total   Lines
+     11 Symbols
+
+  50306 + 450702 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

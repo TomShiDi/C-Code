@@ -1,0 +1,75 @@
+Microsoft (R) Macro Assembler Version 5.00                  10/23/4                                                             Page     1-1
+
+
+				;p181.asm,增序正数数组中插入一个正数。 
+				;******************************************* 
+ 0000				data	segment 
+ 0000  ????			x	dw	? 
+ 0002  0003 0005 000F 0017	array_h	dw	3,5,15,23,37,49,52,65,78,99 
+       0025 0031 0034 0041	
+       004E 0063		
+ 0016  0069			array_e dw	105 
+ 0018  0020			n	dw 	32 
+ 001A				data	ends 
+				;******************************************* 
+ 0000				program	segment 
+ 0000				main	proc	far 
+					assume	cs:program,ds:data 
+ 0000  1E			start:	push 	ds 
+ 0001  2B C0				sub	ax,ax 
+ 0003  50				push	ax 
+ 0004  B8 ---- R			mov	ax,data 
+ 0007  8E D8				mov	ds,ax 
+ 0009  A1 0018 R			mov	ax,n 
+ 000C  C7 06 0000 R FFFF		mov 	array_h-2,0FFFFH 
+ 0012  BE 0000				mov	si,0 
+ 0015  39 84 0016 R		compare:cmp	array_e[si],ax 
+ 0019  7E 09				jle	insert 
+ 001B  89 9C 0018 R			mov 	array_e[si+2],bx 
+ 001F  83 EE 02				sub	si,2 
+ 0022  EB F1				jmp	short compare 
+ 0024  89 84 0018 R		insert:	mov array_e[si+2],ax 
+ 0028  CB				ret 
+ 0029				main	endp 
+ 0029				program	ends 
+					end start 
+Microsoft (R) Macro Assembler Version 5.00                  10/23/4                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+DATA . . . . . . . . . . . . . .  	001A	PARA	NONE	
+PROGRAM  . . . . . . . . . . . .  	0029	PARA	NONE	
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+ARRAY_E  . . . . . . . . . . . .  	L WORD	0016	DATA
+ARRAY_H  . . . . . . . . . . . .  	L WORD	0002	DATA
+
+COMPARE  . . . . . . . . . . . .  	L NEAR	0015	PROGRAM
+
+INSERT . . . . . . . . . . . . .  	L NEAR	0024	PROGRAM
+
+MAIN . . . . . . . . . . . . . .  	F PROC	0000	PROGRAM	Length = 0029
+
+N  . . . . . . . . . . . . . . .  	L WORD	0018	DATA
+
+START  . . . . . . . . . . . . .  	L NEAR	0000	PROGRAM
+
+X  . . . . . . . . . . . . . . .  	L WORD	0000	DATA
+
+@FILENAME  . . . . . . . . . . .  	TEXT  p181		
+
+
+     30 Source  Lines
+     30 Total   Lines
+     12 Symbols
+
+  50218 + 450790 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

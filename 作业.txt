@@ -1,0 +1,362 @@
+
+#include<stdio.h>
+#include<malloc.h>
+#include<string.h>
+#include<stdlib.h>
+#include<conio.h>
+//#include<windows.h>
+struct ss
+{
+	char weizhi[255];
+	char name[255];
+	char miaoshu[255];
+	char mima[255];
+};
+int jiemian();
+int jiamixitong();
+int shuru();
+int shuchu();
+int sousuo();
+int xiugai();
+int jiami();
+int jiemi();
+struct ss a[255]={{"http://www.xuetangx.com/","xiangdesheng","学堂在线","123456"},{"http://acm.hdu.edu.cn/","acm002","杭州电子科技大学OJ","654321"},{"http://www.jikexueyuan.com/","30047495@qq.com","极客学院","123456"}};
+struct ss *p=a;
+int main()
+{
+	int i;
+	char e[255]="账号位置:";
+	char b[255]="账号描述:";
+	char c[255]="账号:";
+	char d[255]="密码:";
+	FILE * fp;
+	fp=fopen("d:\\xinxi.txt","w+");
+	for(i=3;i>0;i--,p++)
+	{
+        fputs(c,fp);
+	    fputs(p->name,fp);
+	    fprintf(fp,"\n");
+	    fputs(b,fp);
+	    fputs(p->miaoshu,fp);
+		fprintf(fp,"\n");
+		fputs(e,fp);
+		fputs(p->weizhi,fp);
+		fprintf(fp,"\n");
+		fputs(d,fp);
+		fputs(p->mima,fp);
+		fprintf(fp,"\n");
+	}
+	fclose(fp);
+    jiamixitong();
+	jiami();
+	while(1)
+	{
+		switch(jiemian())
+		{
+		case 1:shuru();break;
+		case 2:shuchu();break;
+		case 3:sousuo();break;
+		//case 4:xiugai();break;
+		default:exit(1);
+		}
+	}
+		return 0;
+}
+
+
+/***********************************************菜单界面******************************************/
+
+int jiemian()
+{
+	int n;
+	char a[255];
+	printf("**********************************分界线**********************************\n");
+	printf("**********************************管理系统**********************************\n");
+	printf("**********************************菜单选择:**********************************\n");
+	printf("               数字1：                         输入数据\n");
+	printf("               数字2：                         输出数据\n");
+	printf("               数字3：                         数据搜索\n");
+//  printf("               数字4：                         修改数据\n");
+	printf("               其他按键：                      退出程序\n");
+	printf("请输入数字选择功能.........\n");
+	gets(a);
+	if(a[2]=='\0') return 0;
+	else n=atoi(a);
+	return n;
+}
+
+
+/********************************************密码系统***************************************************/
+int jiamixitong()
+{
+	char a[255]="2333";
+	char b[255];
+	int i;
+	for(i=3;i>0;i--)
+	{
+		memset(b,0,255);
+	    printf("请输入密码\n");
+	    gets(b);
+		if(strcmp(a,b)==0)
+		{
+			printf("恭喜你通过了加密系统\n");
+			return 0;
+		}
+	}
+	if(i==0)
+	{
+		printf("密码错误三次强制退出\n");
+		exit(1);
+	}
+}
+
+
+/**********************************************************输入数据**********************************************/
+int shuru()
+{
+	char e[255]="账号位置:";
+	char b[255]="账号描述:";
+	char c[255]="账号:";
+	char d[255]="密码:";
+	char a[255];
+	static int i=0;
+	jiemi();
+	memset(a,0,255);
+	FILE *p;
+	if((p=fopen("d:\\xinxi1.txt","a+"))==NULL)
+	{
+		printf("文件没有打开\n");
+		exit(0);
+	}
+	printf("请按顺序输入数据:账号位置，描述，账号，密码\n");
+	printf("请输入账号\n");
+	gets(a);
+    fputs(c,p);
+	fputs(a,p);
+	fputs("\n",p);
+	memset(a,0,255);
+	printf("请输入描述\n");
+	gets(a);
+    fputs(b,p);
+	fputs(a,p);
+	fputs("\n",p);
+	memset(a,0,255);
+	printf("请输入账号位置\n");
+	gets(a);
+	fputs(e,p);
+	fputs(a,p);
+	fputs("\n",p);
+	memset(a,0,255);
+	printf("请输入密码\n");
+	gets(a);
+	fputs(d,p);
+	fputs(a,p);
+	fputs("\n",p);
+	memset(a,0,255);
+	jiami();
+	fclose(p);
+	return 0;
+}
+
+/*****************************************数据输出****************************************************/
+int shuchu()
+{
+    FILE *p;
+	char a[255],b[255],c[255];
+	int i;
+	jiemi();
+	if((p=fopen("d://xinxi1.txt","r+"))==NULL)
+	{
+		printf("文件没有打开\n");
+		return 0;
+	}
+	rewind(p);
+	printf("请输入要查看的账号名\n");
+	gets(b);
+    while(fgets(a,1024,p)!=NULL)
+	{
+		memset(c,0,255);
+		for(i=5;a[i]!='\0'&&a[i]!='\n';i++)
+			c[i-5]=a[i];
+		//c[i]='\n';
+		if(b[0]==c[0]&&b[1]==c[1]&&b[2]==c[2])
+		{
+			puts(a);
+			fgets(a,1024,p);
+			puts(a);
+			fgets(a,1024,p);
+			puts(a);
+			fgets(a,1024,p);
+			puts(a);
+			rewind(p);
+			jiami();
+			fclose(p);
+			return 0;
+		}
+	}
+	printf("没有找到账号\n");
+	jiami();
+	fclose(p);
+	return 0;
+}
+/*********************************************信息搜索*****************************************/
+int sousuo()
+{
+	FILE *p;
+	char a[255],b[255],c[255];
+	int i,j,k=0;
+	jiemi();
+	memset(b,0,255);
+	memset(c,0,255);
+	if((p=fopen("d:\\xinxi1.txt","r+"))==NULL)
+	{
+		printf("文件打开失败\n");
+		return 0;
+	}
+	rewind(p);
+	printf("请输入要搜索的关键字\n");
+	gets(b);
+	//printf("%d\n",strlen(b));
+	while(fgets(a,1024,p)!=NULL)
+	{
+		for(i=0,j=0;a[i]!='\0';i++)
+		{
+			k=0;
+		    if((a[i]-b[j])==0)
+			{
+				k=1;
+				j++;
+				i++;
+			}
+			if(j>=1&&(a[i]-b[j])!=0) break;
+			if(j==(strlen(b)-1))
+			{
+				puts(a);
+				break;
+			}
+			if(k==1)
+				i--;
+		}
+		memset(a,0,255);
+		memset(c,0,255);
+	}
+	jiami();
+	if(k==0)
+	    printf("没有找到数据\n");
+	return 0;
+}
+
+/**********************************************数据修改********************************************/
+/*int xiugai()
+{
+	FILE *p;
+	char a[255],b[255],c[255],d[255]="\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
+	int i,j;
+	memset(a,0,255);
+	//jiemi();
+	if((p=fopen("d://xinxi1.txt","r+"))==NULL)
+	{
+		printf("文件没有打开\n");
+		return 0;
+	}
+	
+	rewind(p);
+	//printf("数据名包括：账号，密码，账号位置，描述(请输入英文的冒号)\n");
+	printf("请输入要修改的原数据(如，账号，密码，账号位置，描述)\n");
+	gets(b);
+	while(fgets(a,1024,p)!=NULL)
+	{
+		memset(c,0,255);
+		for(i=0;a[i]!=0;i++)
+		{
+			if(a[i]==':')
+			{
+				j=i+1;
+				i++;
+				for(;a[i]>20;i++)
+				{
+					c[i-j]=a[i];
+				}
+			}
+				
+		}
+		//puts(c);
+		//for(i=0;)
+	}
+	printf("没有找到数据\n");
+	return 0;
+}*/
+
+
+
+/****************************************************文件加密**************************************************/
+int jiami()
+{
+	FILE *p,*p1;
+	char a[255];
+	int i;
+	if((p=fopen("d://xinxi1.txt","r+"))==NULL)
+	{
+		printf("文件没有打开\n");
+		return 0;
+	}
+	if((p1=fopen("c://xinxi2.txt","a+"))==NULL)
+	{
+		printf("文件没有打开\n");
+		return 0;
+	}
+	rewind(p);
+	while(fgets(a,1024,p)!=NULL)
+	{
+		fputs(a,p1);
+		//fputs("\n",p1);
+	}
+    fclose(p);
+	fclose(p1);
+	p=fopen("d://xinxi1.txt","w+");
+	fclose(p);
+	return 0;
+}
+
+
+/********************************************************文件解密**********************************************/
+int jiemi()
+{
+	FILE *p,*p1;
+	char a[255];
+	int i;
+	if((p1=fopen("c://xinxi2.txt","r+"))==NULL)
+	{
+		printf("文件没有打开\n");
+		return 0;
+	}
+	if((p=fopen("d://xinxi1.txt","r+"))==NULL)
+	{
+		printf("文件没有打开\n");
+		return 0;
+	}
+
+	rewind(p1);
+	while(fgets(a,1024,p1)!=NULL)
+	{
+	    fputs(a,p);
+		//fputs("\n",p);	
+	}
+	fclose(p);
+	fclose(p1);
+	p1=fopen("c://xinxi2.txt","w+");
+	fclose(p1);
+	return 0;
+}
+
+
+
+
+
+	
+
+
+
+
+
+		

@@ -1,0 +1,108 @@
+
+#include<stdio.h> 
+#include<string.h>
+#include<stdlib.h>
+
+int  main(void) 
+{ 
+	      int chazhao(char a[]);
+          int  i, len; 
+          unsigned char  BM[100]; 
+          char  str[5]; 
+		  memset(str,0,5);
+          printf("请输入一个汉字："); 
+          scanf("%s",BM); 
+          for(len=0;BM[len]!='\0';len++); 
+              for(i=0;i<len;i++) 
+                     printf("BM[%d]=%x\n",i,BM[i]); //输入"向"，则其编码为CF　 F2 
+          printf("将编码转换成字符并显示："); 
+          for(i=0;i<len;i++) 
+                sprintf(str+2*i,"%x",BM[i]); //编码－＞字符，并存入str数组 
+          for(i=0;i<2*len;i++) 
+                printf("%c",str[i]);
+		  printf("\n");
+		  chazhao(str);
+          return  0; 
+
+} 
+
+/******************************************查找函数********************************************/
+int chazhao(char a[])
+{
+	FILE *p,*p1;
+	char b[255],c[255],e[255],d[255]="End of File!!";
+	int j,i,k,n=0;
+	memset(e,0,255);
+	strcpy(e,a);
+	//puts(a);
+	if((p=fopen("d:\\Lishu56.txt","r+"))==NULL)
+	{
+		printf("文件没有打开\n");
+		exit(1);
+	}
+	if((p1=fopen("d:\\wcc.txt","a+"))==NULL)
+	{
+		printf("文件没有打开\n");
+		exit(1);
+	}
+	rewind(p);
+    while(1)
+	{
+		k=0;
+		fgets(b,1024,p);
+		if(strcmp(b,d)==0)
+		{
+			fclose(p);
+			return 0;
+		}
+		//puts(b);
+		for(i=0;b[i]!=0;i++)
+		{
+			memset(c,0,255);
+			if(b[i]==':')
+			{
+				k=1;
+				c[0]=b[i+2];
+				c[1]=b[i+3];
+				c[2]=b[i+4];
+				c[3]=b[i+5];
+				//puts(c);
+				break;
+			}
+		}
+		if(strcmp(e,c)==0)
+		{
+			fgets(b,1024,p);
+			for(j=57;j>0;j--)
+			{
+				fgets(b,1024,p);
+				for(i=0;b[i]!='\n';i++)
+				{
+					if(b[i]=='X')
+						b[i]=49;
+					else
+						b[i]=48;
+				}
+				fputs(b,p1);
+				puts(b);
+			}
+				return 0;
+		}
+		
+		if(k==1)
+		{
+			for(j=58;j>0;j--)
+				fgets(a,1024,p);
+		}
+	}
+	//printf("%d\n",n);
+	fclose(p);
+	return 0;
+}
+
+
+
+
+
+
+

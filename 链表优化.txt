@@ -1,0 +1,267 @@
+#include<stdio.h>
+#include<malloc.h>
+#include<string.h>
+#include<stdlib.h>
+#include<conio.h>
+struct ss
+{
+	long int num;
+	char name[255];
+	struct ss *next;
+};
+//struct ss *p1,*p2;
+
+struct ss *shanchu(struct ss *head);
+//struct ss *charu(struct ss *head);
+
+//text *p1,p2;
+int main()
+{
+	int jiemian();
+	int jiamixitong();
+	struct ss *shujuxiugai(struct ss *head);
+	void *print(struct ss *head);
+    struct ss *shuru(struct ss *head);
+	struct ss *head=NULL;
+    jiamixitong();
+	while(1)
+	{
+		switch(jiemian())
+		{
+		case 1:head=shuru(head);break;
+		case 2:head=shanchu(head);break;
+		//case 3:head=charu(head);break;
+		case 4:print(head);break;
+		default:exit(1);
+		}
+	}
+
+	//print(head);
+		return 0;
+}
+/*******************************************数据输出**************************************************/
+void *print(struct ss *head)
+{
+	struct ss *temp=head;
+	for(;temp!=NULL;)
+	{
+		printf("%d\t%s\n",temp->num,temp->name);
+		temp=temp->next;
+	}
+	printf("\n\n");
+	return head;
+}
+/*********************************************菜单选择***************************************************/
+int jiemian()
+{
+	int n;
+	char a[255];
+	printf("**********************************分界线**********************************\n");
+	printf("**********************************管理系统**********************************\n");
+	printf("**********************************菜单选择:**********************************\n");
+	printf("               数字1：                         输入数据\n");
+	printf("               数字2：                         删除数据\n");
+	printf("               数字3：                         插入数据\n");
+	printf("               数字4：                         输出全部数据\n");
+	printf("               其他按键：                      退出程序\n");
+	printf("请输入数字选择功能.........\n");
+	gets(a);
+	if(a[2]=='\0') return 0;
+	else n=atoi(a);
+	return n;
+}
+/*******************************************输入数据*********************************************************/
+struct ss *shuru(struct ss *head)
+{
+	int num;
+	char a[255]="";
+	struct ss *p1,*p2;
+	printf("请输入学号(直接按enter键退出程序)\n");
+	gets(a);
+	//getchar();
+	if(a[1]=='\0')
+				return 0;
+			else
+				num=atoi(a);
+	//scanf("%ld",&num);
+	p1=(struct ss*)malloc(sizeof(struct ss));
+	while(num>0)
+	{
+        memset(a,0,sizeof(a));
+		//getchar();
+		if(head==NULL)
+		{
+			head=p1;
+			p2=p1;
+			p1->num=num;
+			p1->next=NULL;
+			printf("请输入姓名(直接按enter键退出程序)\n");
+			gets(a);
+			if(a[1]=='\0') return 0;
+			else strcpy(p1->name,a);
+			printf("请输入学号(直接按enter键退出程序)\n");
+			//getchar();
+	        gets(a);
+	        if(a[1]=='\0')
+				return 0;
+			else
+				num=atoi(a);
+		}
+		else
+		{
+			p1=(struct ss *)malloc(sizeof(struct ss));
+			p2->next=p1;
+			p2=p1;
+			p1->num=num;
+			p1->next=NULL;
+			//getchar();
+			printf("请输入姓名(直接按enter键退出程序)\n");
+			gets(a);
+			if(a[1]=='\0') exit(1);
+			else strcpy(p1->name,a);
+			//getchar();
+			printf("请输入学号(直接按enter键退出程序)\n");
+			gets(a);
+			if(a[1]=='\0')
+				return 0;
+			else
+				num=atoi(a);
+		}
+	}
+	return head;
+}
+/**************************************删除数据**********************************************/
+struct ss *shanchu(struct ss *head)
+{
+	char a[255];
+	struct ss *temp,*temp1;
+	long int num,i;
+	while(1)
+    {
+		i=0;
+		memset(a,0,sizeof(a));
+	    printf("请输入要删除数据的学号(直接按enter键退出程序)\n");
+		//getchar();
+	    gets(a);
+		//getchar();
+	    if(a[1]=='\0') 
+		{
+			//getchar();
+			return head;
+		}
+	    else num=atoi(a);
+	    for(temp1=head,temp=head;temp!=NULL;temp=temp->next)
+		{
+		    if(temp->num==num)
+			{
+				if(temp==head)
+				{
+					head=temp->next;
+					free(temp);
+					printf("删除成功\n");
+					i=1;
+					//return head;
+					break;
+				}
+				else
+				{
+					if(temp->next==NULL)
+					{
+						temp1->next=NULL;
+						free(temp);
+						printf("删除成功\n");
+						i=1;
+						//return head;
+						break;
+					}
+					else
+					{
+					    temp1=temp->next;
+					    free(temp);
+					    printf("删除成功\n");
+						i=1;
+					    //return head;
+					    break;
+					}
+				}
+			}
+
+            temp1=temp;
+		}
+		if(i==0)
+		    printf("没有找到数据\n");
+	}
+	return head;
+}
+		   
+/*************************************************插入数据****************************************/
+/*struct ss *charu(struct ss *head)
+{
+	char a[255];
+	int num;
+	struct ss *temp;
+	printf("请输入要插入的数据的学号(直接按enter键退出程序)\n");
+	gets(a);
+	if(a[2]!='\0')
+		return 0;
+	else
+		num=atoi(a);
+	while(1)
+	{
+		if(numtemp->num)
+			temp=temp->next;
+		else*/
+
+/**********************************************加密系统**************************************/
+
+int jiamixitong()
+{
+	char a[255]="2333";
+	char b[255];
+	int i;
+	for(i=3;i>0;i--)
+	{
+		memset(b,0,255);
+	    printf("请输入密码<<233>>搞事\n");
+	    gets(b);
+		if(strcmp(a,b)==0)
+		{
+			printf("恭喜你通过了如此傻逼的加密系统\n");
+			return 0;
+		}
+	}
+	if(i==0)
+	{
+		printf("对不住了兄弟，你的智商堪忧啊\n");
+		exit(1);
+	}
+}
+
+/*************************************************数据修改****************************************/
+struct ss *shujuxiugai(struct ss *head)
+{
+	char a[255];
+	struct ss *temp;
+	printf("请输入要修改信息账号的编号(直接按回车键回到菜单)\n");
+    gets(a);
+	if(a[1]=='\0')
+		return 0;
+	else
+		num=atoi(a);
+	for(temp=head;;temp=temp->next)
+		
+
+
+
+
+
+
+
+
+	
+
+
+
+
+
+		

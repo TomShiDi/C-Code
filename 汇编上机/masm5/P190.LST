@@ -1,0 +1,91 @@
+Microsoft (R) Macro Assembler Version 5.00                  10/23/4                                                             Page     1-1
+
+
+				;p190.asm,ÓÅ»¯Ã°ÅÝ·¨ 
+				;****************************************** 
+ 0000				data	segment 
+ 0000  0008 0005 0010 0054	addr	dw	8,5,16,84,32,22,15,39,50,26 
+       0020 0016 000F 0027	
+       0032 001A		
+ 0014  ????			savecnt	dw	? 
+ 0016				data	ends 
+				;******************************************* 
+ 0000				program	segment 
+ 0000				bubble	proc	far 
+					assume	cs:program,ds:data 
+ 0000  1E			start:	push 	ds 
+ 0001  2B C0				sub	ax,ax 
+ 0003  50				push	ax 
+ 0004  B8 ---- R			mov	ax,data 
+ 0007  8E D8				mov	ds,ax 
+ 0009  B9 000A				mov	cx,10 
+ 000C  89 0E 0014 R			mov	savecnt,cx 
+ 0010  BB 0001			init:	mov	bx,1			;½»»»±ê
+				Ö¾£¬×îÖÕÎª0±í½øÐÐÁË½»»»¡£ 
+ 0013  FF 0E 0014 R			dec	savecnt			;Íâ²ãÑ­
+				»·¼ÆÊýÆ÷ 
+ 0017  74 1F				jz	sorted 
+ 0019  8B 0E 0014 R			mov	cx,savecnt		;µ±ÔÙ´Î
+				½øÈëÍâ²ãÑ­»·£¬Ôò×îºóÈô¸ÉÔªËØÒÑ¾­ÉýÐò 
+ 001D  BF FFFE R			mov	di,offset addr-2	;ds:diÎ
+				ª´®ÆðÊ¼µØÖ· 
+ 0020  83 C7 02			next:	add	di,2 
+ 0023  8B 05				mov	ax,[di] 
+ 0025  39 45 02				cmp	[di+2],ax		;[di+2]
+				-[di] 
+ 0028  73 07				jae	cont			;Á½ÊýÒÑ
+				¾­ÉýÐò 
+ 002A  87 45 02				xchg	[di+2],ax		;Ê¹Á½Êý
+				ÉýÐò 
+ 002D  89 05				mov	[di],ax 
+ 002F  2B DB				sub	bx,bx			;ÒòÎª½»
+				»»£¬bx£½0 
+ 0031  E2 ED			cont:	loop	next 
+ 0033  83 FB 00				cmp	bx,0			;ÅÐÊÇ·ñ
+				½øÐÐ¹ý½»»»¡£ 
+ 0036  74 D8				je	init			;ÒòÎª½»
+				»»¹ý£¬×ªµ½init¼ÌÐø¡£ 
+ 0038  CB			sorted:	ret				;ÒòÎªÎ´
+				½»»»£¬ËµÃ÷ÒÑ¾­È«²¿ÉýÐò¡£ 
+ 0039				bubble	endp 
+ 0039				program	ends 
+					end 	start 
+Microsoft (R) Macro Assembler Version 5.00                  10/23/4                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+DATA . . . . . . . . . . . . . .  	0016	PARA	NONE	
+PROGRAM  . . . . . . . . . . . .  	0039	PARA	NONE	
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+ADDR . . . . . . . . . . . . . .  	L WORD	0000	DATA
+
+BUBBLE . . . . . . . . . . . . .  	F PROC	0000	PROGRAM	Length = 0039
+
+CONT . . . . . . . . . . . . . .  	L NEAR	0031	PROGRAM
+
+INIT . . . . . . . . . . . . . .  	L NEAR	0010	PROGRAM
+
+NEXT . . . . . . . . . . . . . .  	L NEAR	0020	PROGRAM
+
+SAVECNT  . . . . . . . . . . . .  	L WORD	0014	DATA
+SORTED . . . . . . . . . . . . .  	L NEAR	0038	PROGRAM
+START  . . . . . . . . . . . . .  	L NEAR	0000	PROGRAM
+
+@FILENAME  . . . . . . . . . . .  	TEXT  p190		
+
+
+     36 Source  Lines
+     36 Total   Lines
+     12 Symbols
+
+  50294 + 450714 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

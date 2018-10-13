@@ -1,0 +1,115 @@
+Microsoft (R) Macro Assembler Version 5.00                  11/21/4                                                             Page     1-1
+
+
+				;p234.asm,求n! 
+				;不采用结构体。 
+				; 
+				;**********************************************
+				******* 
+ 0000				data	segment 
+ 0000  0003			n	dw	3 
+ 0002  ????			result	dw	? 
+ 0004				data	ends 
+				;**********************************************
+				******* 
+				; 
+				;**********************************************
+				******* 
+ 0000				stack	segment 
+ 0000  0080[				dw	128 dup(0) 
+	   0000			
+			 ]	
+				
+ 0100				tos	label	word 
+ 0100				stack	ends 
+				;**********************************************
+				******* 
+				; 
+				;**********************************************
+				******* 
+ 0000				code	segment 
+					assume	cs:code,ds:data,ss:stack 
+ 0000  B8 ---- R		start:	mov	ax,stack 
+ 0003  8E D0				mov	ss,ax 
+ 0005  BC 0100 R			mov	sp,offset tos 
+				; 
+ 0008  B8 ---- R			mov	ax,data 
+ 000B  8E D8				mov	ds,ax 
+				; 
+ 000D  8B 1E 0000 R			mov	bx,n 
+ 0011  53				push	bx 
+ 0012  E8 001E R			call 	fact 
+				; 
+ 0015  8F 06 0002 R			pop	result 
+ 0019  B8 4C00				mov	ax,4c00h 
+ 001C  CD 21				int 	21h 
+				 
+				;----------------------------------------------
+				--------- 
+ 001E				fact	proc	near 
+ 001E  50				push	ax 
+ 001F  55				push	bp 
+ 0020  8B EC				mov	bp,sp 
+ 0022  8B 46 06				mov	ax,[bp+6] 
+ 0025  3D 0000				cmp	ax,0 
+ 0028  75 04				jne	fact1 
+ 002A  40				inc	ax 
+ 002B  EB 0A 90				jmp	exit 
+Microsoft (R) Macro Assembler Version 5.00                  11/21/4                                                             Page     1-2
+
+
+ 002E  48			fact1:	dec	ax 
+ 002F  50				push	ax 
+ 0030  E8 001E R			call	fact 
+ 0033  58				pop	ax 
+ 0034  F7 66 06				mul	word ptr [bp+6] 
+ 0037  89 46 06			exit:	mov	[bp+6],ax 
+ 003A  5D				pop	bp 
+ 003B  58				pop	ax 
+ 003C  C3				ret 
+ 003D				fact	endp 
+				;----------------------------------------------
+				------------ 
+ 003D				code	ends 
+				;**********************************************
+				************ 
+					end	start 
+Microsoft (R) Macro Assembler Version 5.00                  11/21/4                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+CODE . . . . . . . . . . . . . .  	003D	PARA	NONE	
+DATA . . . . . . . . . . . . . .  	0004	PARA	NONE	
+STACK  . . . . . . . . . . . . .  	0100	PARA	NONE	
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+EXIT . . . . . . . . . . . . . .  	L NEAR	0037	CODE
+
+FACT . . . . . . . . . . . . . .  	N PROC	001E	CODE	Length = 001F
+FACT1  . . . . . . . . . . . . .  	L NEAR	002E	CODE
+
+N  . . . . . . . . . . . . . . .  	L WORD	0000	DATA
+
+RESULT . . . . . . . . . . . . .  	L WORD	0002	DATA
+
+START  . . . . . . . . . . . . .  	L NEAR	0000	CODE
+
+TOS  . . . . . . . . . . . . . .  	L WORD	0100	STACK
+
+@FILENAME  . . . . . . . . . . .  	TEXT  p237		
+
+
+     59 Source  Lines
+     59 Total   Lines
+     12 Symbols
+
+  50218 + 450790 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

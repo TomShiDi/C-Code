@@ -1,0 +1,155 @@
+#include<iostream>
+#include<string>
+#include<cstdio>
+#include<conio.h>
+using namespace std;
+struct shuju
+{
+	char num[100];
+	char name[100];
+	struct shuju *next;
+};
+class W
+{
+public:
+	char caidan();
+	//struct shuju creat();
+	struct shuju *shuru(struct shuju *head);
+	struct shuju *shuchu(struct shuju *head);
+	struct shuju *shanchu(struct shuju *head);
+	private:
+
+};
+char W::caidan()
+{
+	char s;
+	system("cls");
+	cout<<"******************************选择菜单*********************************"<<endl;
+	cout<<"******************按键1:数据输入"<<endl;
+	cout<<"******************按键2:数据输出"<<endl;
+	cout<<"******************按键3:数据删除"<<endl;
+	cout<<"******************其他按键:退出程序"<<endl;
+	s=getchar();
+	getchar();
+	return s;
+}
+struct shuju *W::shuru(struct shuju *head)
+{
+	char a[20];
+	struct shuju *p1,*p2;
+	memset(a,0,20);
+	p1=head;
+	cout<<"请输入产品编号(按回车键退出输入)"<<endl;
+	gets(a);
+	if(strlen(a)<2)
+		return head;
+	while(1)
+	{
+	    if(head->next==NULL)
+		{
+			strcpy(head->num,a);
+			cout<<"请输入产品名字"<<endl;
+			gets(head->name);
+			p2=new struct shuju;
+			head->next=p2;
+			p2->next=NULL;
+		}
+		else
+		{
+			p1=p2;
+			cout<<"请输入产品编号(按回车键退出输入)"<<endl;
+	        gets(a);
+	        if(strlen(a)<2)
+		        return head;
+			strcpy(p2->num,a);
+			cout<<"请输入产品名字"<<endl;
+			gets(p2->name);
+            p2=new struct shuju;
+            p1->next=p2;
+			p2->next=NULL;
+		}
+	}
+}
+struct shuju *W::shuchu(struct shuju *head)
+{
+	struct shuju *temp;
+	temp=head;
+	while(temp->next!=NULL)
+	{
+		cout<<temp->num<<"       "<<temp->name<<endl;
+		temp=temp->next;
+	}
+	getch();
+	return head;
+}
+struct shuju *W::shanchu(struct shuju *head)
+{
+	struct shuju *temp=head;
+	struct shuju *temp1;
+	char a[20];
+	cout<<"请输入要删除的产品的编号(按回车退出本功能)"<<endl;
+	gets(a);
+	if(strlen(a)<2)
+		return head;
+	while(1)
+	{
+        
+		if(strcmp(a,temp->num)==0)
+		{
+			if(temp==head)
+			{
+				head=temp->next;
+				delete temp;
+				cout<<"删除成功"<<endl;
+				getch();
+				break;
+			}
+			if(temp->next==NULL)
+			{
+			    temp1->next=NULL;
+				delete temp;
+                cout<<"删除成功"<<endl;
+				getch();
+				break;
+			}
+			//temp1=temp;
+			temp1->next=temp->next;
+			cout<<"删除成功"<<endl;
+			delete temp;
+            temp1=temp;
+			temp=temp->next;
+			getch();
+		}
+		if(temp->next==NULL)
+		{
+			cout<<"没有找到数据"<<endl;
+			getch();
+			return head;
+		}
+	}
+	return head;
+}
+
+			
+
+
+
+	
+int main()
+{
+	W lei;
+	struct shuju *head;
+	head=new struct shuju;
+	head->next=NULL;
+	while(1)
+	{
+		switch(lei.caidan())
+		{
+		case '1':head=lei.shuru(head);break;
+		case '2':head=lei.shuchu(head);break;
+		case '3':head=lei.shanchu(head);break;
+		default:break;
+		}
+	}
+	return 0;
+}

@@ -1,0 +1,179 @@
+Microsoft (R) Macro Assembler Version 5.00                  11/16/4                                                             Page     1-1
+
+
+				;p226.asm,数组元素求和。 
+				;使用了结构体方法通过堆栈传送参数。 
+				; 
+				; 
+				;**********************************************
+				 
+ 0000				parmseg	segment 
+ 0000  0064[			ary	dw	100	dup(1) 
+	   0001			
+			 ]	
+				
+ 00C8  0064			count	dw	100 
+ 00CA  ????			sum	dw 	? 
+ 00CC				parmseg	ends 
+				;**********************************************
+				 
+				; 
+				;**********************************************
+				 
+ 0000				stack	segment 
+ 0000  0080[				dw	128	dup(?) 
+	   ????			
+			 ]	
+				
+ 0100				tos	label	word 
+ 0100				stack	ends 
+				;**********************************************
+				 
+				; 
+				;**********************************************
+				 
+ 0000				code1	segment 
+ 0000				main	proc	far 
+					assume	cs:code1,ds:parmseg,ss:stack 
+ 0000  B8 ---- R		start:	mov	ax,stack 
+ 0003  8E D0				mov	ss,ax 
+ 0005  BC 0100 R			mov	sp,offset tos 
+				; 
+ 0008  1E				push	ds 
+ 0009  2B C0				sub	ax,ax 
+ 000B  50				push	ax 
+				; 
+ 000C  B8 ---- R			mov	ax,parmseg 
+ 000F  8E D8				mov	ds,ax 
+				; 
+ 0011  BB 0000 R			mov	bx,offset ary 
+ 0014  53				push	bx 
+ 0015  BB 00C8 R			mov	bx,offset count 
+ 0018  53				push	bx 
+ 0019  BB 00CA R			mov	bx,offset sum 
+ 001C  53				push 	bx 
+				; 
+ 001D  9A 0000 ---- R			call	far ptr proadd 
+				; 
+Microsoft (R) Macro Assembler Version 5.00                  11/16/4                                                             Page     1-2
+
+
+ 0022  CB				ret 
+ 0023				main	endp 
+				; 
+ 0023				code1	ends 
+				;**********************************************
+				 
+				; 
+				;**********************************************
+				 
+ 0000				code2	segment 
+					assume	cs:code2 
+				; 
+				stack_strc	struc 
+ 0000  ????				save_bp	dw	? 
+ 0002  0002[				s_csip	dw	2	dup(?) 
+	   ????			
+			 ]	
+				
+ 0006  ????				p3_addr	dw	? 
+ 0008  ????				p2_addr	dw	? 
+ 000A  ????				p1_addr	dw	? 
+ 000C				stack_strc	ends 
+				; 
+				;----------------------------------------------
+				- 
+				;子程序名：proadd。 
+				;功能：数组元素求和。 
+				;入口参数：数组首址、数组长度地址、结果单元地址
+				在栈顶三单元。 
+				;返回值：结果在结果单元。 
+				;算法：使用结构体形式。 
+				; 
+ 0000				proadd	proc	far 
+ 0000  55				push	bp 
+ 0001  8B EC				mov	bp,sp 
+ 0003  50				push	ax 
+ 0004  51				push	cx 
+ 0005  56				push	si 
+ 0006  57				push	di 
+ 0007  8B 76 0A				mov	si,[bp].p1_addr 
+ 000A  8B 7E 08				mov	di,[bp].p2_addr 
+ 000D  8B 0D				mov	cx,[di] 
+ 000F  8B 7E 06				mov	di,[bp].p3_addr 
+ 0012  33 C0				xor	ax,ax 
+ 0014  03 04			next:	add	ax,[si] 
+ 0016  83 C6 02				add	si,2 
+ 0019  E2 F9				loop	next 
+ 001B  89 05				mov	[di],ax 
+ 001D  5F				pop	di 
+ 001E  5E				pop	si 
+ 001F  59				pop	cx 
+ 0020  58				pop	ax 
+ 0021  5D				pop	bp 
+ 0022  CA 0006				ret	6 
+Microsoft (R) Macro Assembler Version 5.00                  11/16/4                                                             Page     1-3
+
+
+ 0025				proadd	endp 
+				;----------------------------------------------
+				---- 
+				; 
+ 0025				code2	ends 
+				;**********************************************
+				***** 
+					end 	start 
+Microsoft (R) Macro Assembler Version 5.00                  11/16/4                                                             Symbols-1
+
+
+Structures and Records:
+
+                N a m e                 Width   # fields
+                                        Shift   Width   Mask    Initial
+
+STACK_STRC . . . . . . . . . . .  	000C	0005
+  SAVE_BP  . . . . . . . . . . .  	0000
+  S_CSIP . . . . . . . . . . . .  	0002
+  P3_ADDR  . . . . . . . . . . .  	0006
+  P2_ADDR  . . . . . . . . . . .  	0008
+  P1_ADDR  . . . . . . . . . . .  	000A
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+CODE1  . . . . . . . . . . . . .  	0023	PARA	NONE	
+CODE2  . . . . . . . . . . . . .  	0025	PARA	NONE	
+PARMSEG  . . . . . . . . . . . .  	00CC	PARA	NONE	
+STACK  . . . . . . . . . . . . .  	0100	PARA	NONE	
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+ARY  . . . . . . . . . . . . . .  	L WORD	0000	PARMSEG	Length = 0064
+
+COUNT  . . . . . . . . . . . . .  	L WORD	00C8	PARMSEG
+
+MAIN . . . . . . . . . . . . . .  	F PROC	0000	CODE1	Length = 0023
+
+NEXT . . . . . . . . . . . . . .  	L NEAR	0014	CODE2
+
+PROADD . . . . . . . . . . . . .  	F PROC	0000	CODE2	Length = 0025
+
+START  . . . . . . . . . . . . .  	L NEAR	0000	CODE1
+SUM  . . . . . . . . . . . . . .  	L WORD	00CA	PARMSEG
+
+TOS  . . . . . . . . . . . . . .  	L WORD	0100	STACK
+
+@FILENAME  . . . . . . . . . . .  	TEXT  p226		
+
+
+     96 Source  Lines
+     96 Total   Lines
+     20 Symbols
+
+  49920 + 451088 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

@@ -1,0 +1,138 @@
+Microsoft (R) Macro Assembler Version 5.00                  11/22/4                                                             Page     1-1
+
+
+				;p324.asm,每10秒响铃并显示提示字符串。 
+				; 
+				; 
+				; 
+				;**********************************************
+				********** 
+ 0000				dseg     segment 
+ 0000  0001			count    dw 1 
+ 0002  54 68 65 20 62 65 6C	mess     db 'The bell is ring!',0dh,0ah,'$' 
+       6C 20 69 73 20 72 69	
+       6E 67 21 0D 0A 24	
+ 0016				dseg     ends 
+				;**********************************************
+				********** 
+				; 
+				;**********************************************
+				********** 
+ 0000				cseg     segment 
+				         assume cs:cseg,ds:dseg,es:dseg 
+ 0000  B8 ---- R		start:   mov  ax,dseg 
+ 0003  8E D8				 mov  ds,ax 
+				; 
+ 0005  B0 1C				 mov  al,1ch 
+ 0007  B4 35				 mov  ah,35h 
+ 0009  CD 21				 int  21h 
+ 000B  06				 push es 
+ 000C  53				 push bx	;保存原中断向量。 
+ 000D  1E				 push ds	 
+				; 
+ 000E  BA 003C R			 mov  dx,offset ring 
+ 0011  B8 ---- R			 mov  ax,seg ring 
+ 0014  8E D8				 mov  ds,ax 
+ 0016  B8 251C				 mov  ax,251ch 
+ 0019  CD 21				 int  21h	;设置新中断向量。 
+				; 
+ 001B  1F				 pop  ds 
+ 001C  E4 21				 in   al,21h 
+ 001E  24 FE				 and  al,0feh 
+ 0020  E6 21				 out  21h,al 
+ 0022  CD 21				 int  21h 
+ 0024  FB				 sti		;设置中断屏蔽位。 
+				; 
+ 0025  BF FFFF			         mov  di,0ffffh	;延时。 
+ 0028  BE FFFF			delay:   mov  si,0ffffh 
+ 002B  4E			delay1:  dec  si 
+ 002C  75 FD			         jnz  delay1 
+ 002E  4F				 dec  di 
+ 002F  75 F7				 jnz  delay 
+				; 
+ 0031  5A				 pop  dx 
+ 0032  1F				 pop  ds 
+ 0033  B8 251C				 mov  ax,251ch 
+ 0036  CD 21				 int  21h	;恢复原中断向量。 
+				; 
+Microsoft (R) Macro Assembler Version 5.00                  11/22/4                                                             Page     1-2
+
+
+ 0038  B4 4C			         mov  ah,4ch 
+ 003A  CD 21			         int  21h 
+				 
+ 003C				ring     proc 
+ 003C  1E			         push ds 
+ 003D  50				 push ax 
+ 003E  51				 push cx 
+ 003F  52				 push dx 
+ 0040  53			         push bx 
+ 0041  B8 ---- R		         mov  ax,dseg 
+ 0044  8E D8			         mov  ds,ax 
+ 0046  FB			         sti 
+ 0047  FF 0E 0000 R		         dec  count 
+ 004B  75 20			         jnz  exit 
+ 004D  BA 0002 R		         mov  dx,offset mess 
+ 0050  B4 09			         mov  ah,9 
+ 0052  CD 21			         int  21h 
+ 0054  BA 0064			         mov  dx,100 
+ 0057  E4 61			         in   al,61h 
+ 0059  24 FC			         and  al,0fch 
+ 005B  34 02			sound:   xor  al,2 
+ 005D  E6 61			         out  61h,al 
+ 005F  B9 FFFF			         mov  cx,0ffffh 
+ 0062  E2 FE			wait1:   loop wait1 
+ 0064  4A			         dec  dx 
+ 0065  75 F4			         jne  sound 
+ 0067  C7 06 0000 R 00B6	         mov  count,182 
+ 006D  FA			exit:    cli 
+ 006E  5B			         pop  bx 
+ 006F  5A			         pop  dx 
+ 0070  59				 pop  cx 
+ 0071  58				 pop  ax 
+ 0072  1F				 pop  ds 
+ 0073  CF				 iret 
+ 0074				ring     endp 
+ 0074				cseg     ends 
+				         end  start 
+Microsoft (R) Macro Assembler Version 5.00                  11/22/4                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+CSEG . . . . . . . . . . . . . .  	0074	PARA	NONE	
+DSEG . . . . . . . . . . . . . .  	0016	PARA	NONE	
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+COUNT  . . . . . . . . . . . . .  	L WORD	0000	DSEG
+
+DELAY  . . . . . . . . . . . . .  	L NEAR	0028	CSEG
+DELAY1 . . . . . . . . . . . . .  	L NEAR	002B	CSEG
+
+EXIT . . . . . . . . . . . . . .  	L NEAR	006D	CSEG
+
+MESS . . . . . . . . . . . . . .  	L BYTE	0002	DSEG
+
+RING . . . . . . . . . . . . . .  	N PROC	003C	CSEG	Length = 0038
+
+SOUND  . . . . . . . . . . . . .  	L NEAR	005B	CSEG
+START  . . . . . . . . . . . . .  	L NEAR	0000	CSEG
+
+WAIT1  . . . . . . . . . . . . .  	L NEAR	0062	CSEG
+
+@FILENAME  . . . . . . . . . . .  	TEXT  p324		
+
+
+     86 Source  Lines
+     86 Total   Lines
+     13 Symbols
+
+  50372 + 450636 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

@@ -1,0 +1,41 @@
+#include<stdio.h>
+int main()
+{
+	 long long int p1,p2,p3,n,w,a,b,c;
+	while(scanf("%d%d%d%d",&a,&b,&c,&n)!=EOF)
+	{
+		w=1;
+		if(n==0)
+		{
+			printf("1\n");
+			continue;
+		}
+
+	   for(;n>0;n--)
+	   {
+		   p1=p2=p3=0;
+	       if(a>=n)
+		       a=n;
+	       if(b>=n)
+		       b=n;
+	       if(c>=n)
+		       c=n;
+	       if(a>0)
+		       p1=1;
+	       if(b>0)
+		       p2=1;
+	       if(c>0)
+		       p3=1;
+		   w=(p1+p2+p3)*w;
+		   a--;
+		   b--;
+		   c--;
+	   }
+	   printf("%lld\n",w);
+	 }
+	return 0;
+}
+
+
+
+

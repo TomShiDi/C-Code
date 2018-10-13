@@ -1,0 +1,48 @@
+#include<stdio.h>
+int w(int n)
+{
+	int x;
+	for(x=2;x<=n;x++)
+	{
+		if(n%x==0&&x!=n)
+		{
+			return 0;
+			break;
+		}
+	}
+		return n;
+}
+
+int main()
+{
+	int a,b,n,i,a1,b1;
+	i=15;
+	while(1)
+	{
+	    scanf("%d",&n);
+	    for(a=2;a<=n/2;a++)
+		{
+		    a1=w(a);
+		    if(a1!=a)
+			{
+				i--;
+			    continue;
+			}
+		    b=n-a;
+		    b1=w(b);
+		    if(b1!=b)
+			{
+				i--;
+			    continue;
+			}
+		    printf("%d %d\n",a,b);
+			break;
+		}
+		i--;
+	}
+	printf("\n");
+		    return 0;
+}
+
+
+//471822

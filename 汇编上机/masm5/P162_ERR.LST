@@ -1,0 +1,127 @@
+Microsoft (R) Macro Assembler Version 5.00                  11/12/6                                                             Page     1-1
+
+
+				;program title goes here p162_asm 
+				 
+				;****************************************** 
+ 0000				data_seg		segment 
+ 0000  01 02 03 04 05 06 07	  table		db 	1,2,3,4,5,6,7,8,9,10,11
+				,12,13,14,15,16,40  dup('a') 
+       08 09 0A 0B 0C 0D 0E	
+       0F 10			
+       0028[			
+	   61			
+			 ]	
+				
+ 0038				data_seg		ends 
+				;****************************************** 
+				 
+				;****************************************** 
+ 0000				extra		segment 
+ 0000  0028[			  y		db	40  dup(?) 
+	    ??			
+			 ]	
+				
+ 0028				extra		ends 
+				;****************************************** 
+				 
+				;****************************************** 
+ 0000				code		segment 
+				;------------------------------------------ 
+ 0000				main		proc	far 
+						assume	cs:code,ds:data_seg,es:
+				extra 
+ 0000				start:		 
+				;set up stack for return 
+ 0000  1E					push	ds		 
+ 0001  2B C0					sub	ax,ax 
+ 0003  50					push	ax 
+				;set ds register to current data segment
+						 
+ 0004  B8 ---- R				mov	ax,data_seg	
+					 
+ 0007  8E D8					mov 	ds,ax 
+				;seg es register to current extra segment
+						 
+ 0009  B8 ---- R				mov	ax,extra	 
+ 000C  8B D8					mov	bx,ax 
+ 000E  8E C3					mov	es,bx 
+ 0010  8E C0					mov     es,ax 
+				;main part of program goes here 
+ 0012  8D 36 0000 R				lea	si,table 
+ 0016  8D 3E 0000 R				lea	di,y 
+ 001A  FC					cld			
+					;set DF flag to forward 
+ 001B  B9 0028					mov	cx,40 
+ 001E  F3/ A4					rep	movsb 
+ 0020  B0 65					mov	al,'e' 
+Microsoft (R) Macro Assembler Version 5.00                  11/12/6                                                             Page     1-2
+
+
+ 0022  B4 45					mov	ah,'E' 
+ 0024  BB 0000 R				mov	bx,offset table 
+ 0027  26: 8B 82 0000 R				mov	ax,word ptr y[bp][si] 
+ 002C  C6 04 0A					mov	byte ptr [si],0ah 
+ 002F  C7 44 02 000B				mov	word ptr [si+2],0bh 
+ 0034  87 CA					xchg	cx,dx 
+ 0036  87 1A					xchg	bx,[bp][si] 
+ 0038  BB 0000 R				mov	bx,offset table 
+ 003B  B0 0F					mov	al,0fH 
+ 003D  D7					xlat		 
+				;error 
+ 003E  B0 0A					mov	al,050ah 
+p162_err.ASM(51): error A2050: Value out of range
+ 0040  8A C3					mov	al,bx 
+p162_err.ASM(52): warning A4031: Operand types must match
+ 0042  26:					mov	y,table 
+p162_err.ASM(53): error A2052: Improper operand type
+ 0043  BB 0100					mov	ds,100h 
+p162_err.ASM(54): error A2056: Immediate mode illegal
+ 0046  8E 0C					mov	cs,word ptr [si] 
+p162_err.ASM(55): error A2059: Illegal use of CS register
+ 0048  8E D8					mov	ds,es 
+p162_err.ASM(56): error A2019: Wrong type of register
+				 
+				 
+ 004A  CB					ret 
+ 004B				main		endp 
+p162_err.ASM(60): error A2006: Phase error between passes
+				;----------------------------------------------
+				 
+ 004B				code		ends 
+				;********************************************* 
+						end	start 
+Microsoft (R) Macro Assembler Version 5.00                  11/12/6                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+CODE . . . . . . . . . . . . . .  	004B	PARA	NONE	
+DATA_SEG . . . . . . . . . . . .  	0038	PARA	NONE	
+EXTRA  . . . . . . . . . . . . .  	0028	PARA	NONE	
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+MAIN . . . . . . . . . . . . . .  	F PROC	0000	CODE	Length = 004B
+
+START  . . . . . . . . . . . . .  	L NEAR	0000	CODE
+
+TABLE  . . . . . . . . . . . . .  	L BYTE	0000	DATA_SEG
+
+Y  . . . . . . . . . . . . . . .  	L BYTE	0000	EXTRA	Length = 0028
+
+@FILENAME  . . . . . . . . . . .  	TEXT  p162_err		
+
+
+     64 Source  Lines
+     64 Total   Lines
+      9 Symbols
+
+  50022 + 450570 Bytes symbol space free
+
+      1 Warning Errors
+      6 Severe  Errors

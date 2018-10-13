@@ -1,0 +1,25 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+int main()
+{
+	FILE *p;
+	char a[7],b[5][7];
+	char (*q)[7]=b;
+	char (*w)[7]=b;
+	long int s; 
+	memset(a,0,100);
+	if((p=fopen("d:\\shuju.txt","w+"))==NULL) exit(1);
+	gets(a);
+	fputs(a,p);
+	fclose(p);
+	p=fopen("d:\\shuju.txt","r+");
+	while(fgets(a,7,p)!=NULL)
+	{
+		strcpy((*q),a);
+		q++;
+		//memset(a,0,100);
+	}
+	q--;
+	return 0;
+}

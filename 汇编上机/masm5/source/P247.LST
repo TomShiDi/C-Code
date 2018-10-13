@@ -1,0 +1,302 @@
+Microsoft (R) Macro Assembler Version 5.00                  11/21/4                                                             Page     1-1
+
+
+				;p247.asm,ÈËÃûÅÅÐò,Ê¹ÓÃÈçÏÂ¹ý³Ì¡£ 
+				;b10read:ÊäÈëÈËÃû´®¡£ 
+				;d10stor:ÊäÈëÈËÃû´®´æÈëÈËÃû±íÖÐ¡£ 
+				;g10sort:ÈËÃû±íÖÐÈËÃû´®°´×ÖÄ¸Ë³ÐòÅÅÐò¡£ 
+				;k10disp:ÏÔÊ¾ÈËÃû±í¡£ 
+				; 
+				; 
+					.model	small 
+ 0040					.stack	40h 
+				; 
+				;**********************************************
+				** 
+ 0000					.data 
+ 0000				namepar	label	byte 
+ 0000  15			maxnlen	db	21 
+ 0001  ??			namelen	db	? 
+ 0002  0015[			namefld	db	21 dup(?) 
+	    ??			
+			 ]	
+				
+ 0017  0D 0A 24			crlf	db	13,10,'$' 
+ 001A  ????			endaddr	dw	? 
+ 001C  4E 61 6D 65 3F 0D 0A	messg1	db	'Name?',13,10,'$' 
+       24			
+ 0024  53 6F 72 74 65 64 20	messg2	db	'Sorted name:',13,10,'$' 
+       6E 61 6D 65 3A 0D 0A	
+       24			
+ 0033  00			namectr	db	0 
+ 0034  001E[			nametab	db	30 dup(20 dup(' ')) 
+	0014[			
+	    20			
+			]	
+			 ]	
+				
+ 028C  0014[			namesav	db	20 dup(?),13,10,'$' 
+	    ??			
+			 ]	
+       0D 0A 24			
+ 02A3  00			swapped	db	0 
+				; 
+				;**********************************************
+				* 
+ 0000					.code 
+ 0000  B8 ---- R		start: 	mov	ax,@data 
+ 0003  8E D8				mov	ds,ax 
+ 0005  8E C0				mov	es,ax 
+				; 
+ 0007  FC				cld 
+ 0008  8D 3E 0034 R			lea	di,nametab 
+ 000C  E8 0034 R		a20loop:call	b10read 
+ 000F  80 3E 0001 R 00			cmp	namelen,0 
+ 0014  74 0C				jz	a30 
+ 0016  80 3E 0033 R 1E			cmp	namectr,30 
+ 001B  74 05				je	a30 
+Microsoft (R) Macro Assembler Version 5.00                  11/21/4                                                             Page     1-2
+
+
+ 001D  E8 0060 R			call	d10stor 
+ 0020  EB EA				jmp	a20loop 
+				; 
+ 0022  80 3E 0033 R 01		a30:	cmp	namectr,1 
+ 0027  76 06				jbe	a40 
+ 0029  E8 006F R			call 	g10sort 
+ 002C  E8 00C3 R			call 	k10disp 
+				; 
+ 002F  B8 4C00			a40:	mov	ax,4c00h 
+ 0032  CD 21				int	21h 
+				; 
+				;----------------------------------------------
+				------ 
+				;¹ý³ÌÃû£ºb10read 
+				;¹¦ÄÜ£º¼üÈëÈËÃû´®´æÈënamepar»º³åÇø£¨²»¹»²¿·ÖÓÃ¿
+				Õ¸ñ´úÌæ£©¡£ 
+				;Èë¿Ú²ÎÊý£ºnamepar»º³åÇøÊ×µØÖ·¡£ 
+				;·µ»ØÖµ£º´®´æÈënamepar»º³åÇø¡£ 
+				; 
+				; 
+ 0034				b10read	proc	near 
+				;	 
+ 0034  B4 09				mov	ah,9 
+ 0036  8D 16 001C R			lea	dx,messg1 
+ 003A  CD 21				int	21h 
+				; 
+ 003C  B4 0A				mov	ah,0ah 
+ 003E  8D 16 0000 R			lea	dx,namepar	 
+ 0042  CD 21				int	21h 
+				; 
+ 0044  B4 09				mov	ah,9 
+ 0046  8D 16 0017 R			lea	dx,crlf 
+ 004A  CD 21				int	21h 
+				; 
+ 004C  B7 00				mov	bh,0 
+ 004E  8A 1E 0001 R			mov	bl,namelen 
+ 0052  B9 0015				mov	cx,21 
+ 0055  2B CB				sub	cx,bx 
+ 0057  C6 87 0002 R 20		b20:	mov	namefld[bx],20h 
+ 005C  43				inc 	bx 
+ 005D  E2 F8				loop	b20 
+ 005F  C3				ret 
+ 0060				b10read	endp 
+				; 
+				;----------------------------------------------
+				--------- 
+				; 
+				;----------------------------------------------
+				--------- 
+				;¹ý³ÌÃû£ºd10stor 
+				;¹¦ÄÜ£º½«namepar»º³åÇøÖÐÒ»¸öÈËÃû´®´æÈënametabÖÐ
+				¡£ 
+				;Èë¿Ú²ÎÊý£ºÔ´´®Ê×Ö·namefld£¬Ä¿µÄ´®Ê×Ö·diÖÐ¡£ 
+				;·µ»ØÖµ£ºÎÞ¡£ÊµÏÖÈËÃû´®±£´æ¡£ 
+Microsoft (R) Macro Assembler Version 5.00                  11/21/4                                                             Page     1-3
+
+
+				; 
+ 0060				d10stor	proc	near 
+ 0060  FE 06 0033 R			inc	namectr 
+ 0064  FC				cld 
+ 0065  8D 36 0002 R			lea	si,namefld 
+ 0069  B9 000A				mov	cx,10 
+ 006C  F3/ A5				rep	movsw 
+ 006E  C3				ret 
+ 006F				d10stor	endp 
+				; 
+				;----------------------------------------------
+				---------- 
+				; 
+				;----------------------------------------------
+				---------- 
+				;¹ý³ÌÃû£ºg10sort 
+				;¹¦ÄÜ£ºÈËÃû´®°´×ÖÄ¸Ë³ÐòÅÅÐò 
+				;Èë¿Ú²ÎÊý£»ÈËÃû±íÊ×Ö·nametab£¬×îºóµÄÈËÃû´®ºóµÄ¿
+				Õ´®Ê×Ö·ÔÚdi¡£ 
+				;·µ»ØÖµ£ºÎÞ¡£ 
+				;Ëã·¨£ºÃ°ÅÝÅÅÐò£¬ÉèÖÃ½»»»±êÖ¾swapped£¬si,diÖ¸Ïò
+				ÏàÁÚÁ½´®¡£ 
+				; 
+ 006F				g10sort	proc	near 
+ 006F  83 EF 28				sub	di,40 
+ 0072  89 3E 001A R			mov	endaddr,di 
+ 0076  C6 06 02A3 R 00		g20:	mov	swapped,0 
+ 007B  8D 36 0034 R			lea	si,nametab 
+ 007F  B9 0014			g30:	mov	cx,20 
+ 0082  8B FE				mov	di,si 
+ 0084  83 C7 14				add	di,20 
+ 0087  8B C7				mov	ax,di 
+ 0089  8B DE				mov	bx,si 
+ 008B  F3/ A6				repe	cmpsb 
+ 008D  76 03				jbe	g40 
+ 008F  E8 00A2 R			call	h10xchg 
+ 0092  8B F0			g40:	mov	si,ax 
+ 0094  3B 36 001A R			cmp	si,endaddr 
+ 0098  76 E5				jbe	g30 
+ 009A  80 3E 02A3 R 00			cmp	swapped,0 
+ 009F  75 D5				jnz	g20 
+ 00A1  C3				ret 
+ 00A2				g10sort	endp 
+				; 
+				;----------------------------------------------
+				----------- 
+				;¹ý³ÌÃû£ºh10xchg 
+				;¹¦ÄÜ£º½»»»ÏàÁÚÁ½´® 
+				;Èë¿Ú²ÎÊý£ºÇ°Ò»´®µØÖ·ÔÚbxÖÐ,ÁÙÊ±´®Ê×Ö·namesav¡£
+				´«ËÍÊ±si,di·Ö±ðÖ¸ÏòÁ½´® 
+				;·µ»ØÖµ£ºÎÞ¡£ 
+				;Ëã·¨£ºÐÂ¡¢¾Ési/diµÄÏÎ½Ó£»ÁíÍâÉèÖÃswapped±êÖ¾Îª
+				1 
+				; 
+Microsoft (R) Macro Assembler Version 5.00                  11/21/4                                                             Page     1-4
+
+
+				; 
+ 00A2				h10xchg	proc	near 
+ 00A2  B9 000A				mov	cx,10 
+ 00A5  8D 3E 028C R			lea	di,namesav 
+ 00A9  8B F3				mov	si,bx 
+ 00AB  F3/ A5				rep	movsw 
+				; 
+ 00AD  B9 000A				mov	cx,10 
+ 00B0  8B FB				mov	di,bx 
+ 00B2  F3/ A5				rep	movsw 
+				; 
+ 00B4  B9 000A				mov	cx,10 
+ 00B7  8D 36 028C R			lea	si,namesav 
+ 00BB  F3/ A5				rep	movsw 
+				; 
+ 00BD  C6 06 02A3 R 01			mov	swapped,1 
+ 00C2  C3				ret 
+ 00C3				h10xchg	endp 
+				; 
+				;----------------------------------------------
+				--------------- 
+				; 
+				;----------------------------------------------
+				--------------- 
+				;¹ý³ÌÃû£ºk10disp 
+				;¹¦ÄÜ£º½«ÈËÃû±íÏÔÊ¾ÔÚÆÁÄ»ÉÏ¡£ 
+				;Èë¿Ú²ÎÊý£ºÌáÊ¾×Ö·û´®Ê×Ö·£¬ÈËÃû±íÊ×Ö·¡£ 
+				;·µ»ØÖµ£ºÎÞ 
+				;Ëã·¨£º½«ÈËÃû´®ÒÀ´ÎËÍµ½namesav´®ÖÐ£¬ÒòÎªËüÓÐ½áÊ
+				ø±êÖ¾¡£ 
+				; 
+ 00C3				k10disp	proc	near 
+ 00C3  B4 09				mov	ah,9 
+ 00C5  8D 16 0024 R			lea	dx,messg2 
+ 00C9  CD 21				int	21h 
+				; 
+ 00CB  8D 36 0034 R			lea	si,nametab 
+ 00CF  8D 3E 028C R		k20:	lea	di,namesav 
+ 00D3  B9 000A				mov	cx,10 
+ 00D6  F3/ A5				rep	movsw 
+ 00D8  B4 09				mov	ah,9 
+ 00DA  8D 16 028C R			lea	dx,namesav 
+ 00DE  CD 21				int	21h 
+				;	 
+ 00E0  FE 0E 0033 R			dec	namectr 
+ 00E4  75 E9				jnz	k20 
+ 00E6  C3				ret 
+ 00E7				k10disp	endp 
+				; 
+				;----------------------------------------------
+				---------------- 
+				; 
+				;**********************************************
+				**************** 
+Microsoft (R) Macro Assembler Version 5.00                  11/21/4                                                             Page     1-5
+
+
+ 00E7					end	start 
+Microsoft (R) Macro Assembler Version 5.00                  11/21/4                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+DGROUP . . . . . . . . . . . . .  	GROUP
+  _DATA  . . . . . . . . . . . .  	02A4	WORD	PUBLIC	'DATA'
+  STACK  . . . . . . . . . . . .  	0040	PARA	STACK	'STACK'
+_TEXT  . . . . . . . . . . . . .  	00E7	WORD	PUBLIC	'CODE'
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+A20LOOP  . . . . . . . . . . . .  	L NEAR	000C	_TEXT
+A30  . . . . . . . . . . . . . .  	L NEAR	0022	_TEXT
+A40  . . . . . . . . . . . . . .  	L NEAR	002F	_TEXT
+
+B10READ  . . . . . . . . . . . .  	N PROC	0034	_TEXT	Length = 002C
+B20  . . . . . . . . . . . . . .  	L NEAR	0057	_TEXT
+
+CRLF . . . . . . . . . . . . . .  	L BYTE	0017	_DATA
+
+D10STOR  . . . . . . . . . . . .  	N PROC	0060	_TEXT	Length = 000F
+
+ENDADDR  . . . . . . . . . . . .  	L WORD	001A	_DATA
+
+G10SORT  . . . . . . . . . . . .  	N PROC	006F	_TEXT	Length = 0033
+G20  . . . . . . . . . . . . . .  	L NEAR	0076	_TEXT
+G30  . . . . . . . . . . . . . .  	L NEAR	007F	_TEXT
+G40  . . . . . . . . . . . . . .  	L NEAR	0092	_TEXT
+
+H10XCHG  . . . . . . . . . . . .  	N PROC	00A2	_TEXT	Length = 0021
+
+K10DISP  . . . . . . . . . . . .  	N PROC	00C3	_TEXT	Length = 0024
+K20  . . . . . . . . . . . . . .  	L NEAR	00CF	_TEXT
+
+MAXNLEN  . . . . . . . . . . . .  	L BYTE	0000	_DATA
+MESSG1 . . . . . . . . . . . . .  	L BYTE	001C	_DATA
+MESSG2 . . . . . . . . . . . . .  	L BYTE	0024	_DATA
+
+NAMECTR  . . . . . . . . . . . .  	L BYTE	0033	_DATA
+NAMEFLD  . . . . . . . . . . . .  	L BYTE	0002	_DATA	Length = 0015
+NAMELEN  . . . . . . . . . . . .  	L BYTE	0001	_DATA
+NAMEPAR  . . . . . . . . . . . .  	L BYTE	0000	_DATA
+NAMESAV  . . . . . . . . . . . .  	L BYTE	028C	_DATA	Length = 0014
+NAMETAB  . . . . . . . . . . . .  	L BYTE	0034	_DATA	Length = 001E
+
+START  . . . . . . . . . . . . .  	L NEAR	0000	_TEXT
+SWAPPED  . . . . . . . . . . . .  	L BYTE	02A3	_DATA
+
+@CODE  . . . . . . . . . . . . .  	TEXT  _TEXT		
+@CODESIZE  . . . . . . . . . . .  	TEXT  0		
+@DATASIZE  . . . . . . . . . . .  	TEXT  0		
+@FILENAME  . . . . . . . . . . .  	TEXT  p247		
+Microsoft (R) Macro Assembler Version 5.00                  11/21/4                                                             Symbols-2
+
+
+
+
+    184 Source  Lines
+    184 Total   Lines
+     40 Symbols
+
+  50246 + 450762 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

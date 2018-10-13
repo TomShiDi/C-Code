@@ -1,0 +1,90 @@
+Microsoft (R) Macro Assembler Version 5.00                  10/11/5                                                             Page     1-1
+
+
+				;program title goes here p162_asm 
+				 
+				;****************************************** 
+ 0000				data		segment 
+ 0000  0028[			  source_buffer	db 	40  dup('a') 
+	   61			
+			 ]	
+				
+ 0028				data		ends 
+				;****************************************** 
+				 
+				;****************************************** 
+ 0000				extra		segment 
+ 0000  0028[			  dest_buffer	db	40  dup(?) 
+	    ??			
+			 ]	
+				
+ 0028				extra		ends 
+				;****************************************** 
+				 
+				;****************************************** 
+ 0000				code		segment 
+				;------------------------------------------ 
+ 0000				main		proc	far 
+						assume	cs:code,ds:data,es:extr
+				a 
+ 0000				start:		 
+				;set up stack for return 
+ 0000  1E					push	ds		 
+ 0001  2B C0					sub	ax,ax 
+ 0003  50					push	ax 
+				;set ds register to current data segment
+						 
+ 0004  B8 ---- R				mov	ax,data		 
+ 0007  BB 0000					mov 	ds  ax 
+p162.ASM(27): error A2028: Operator expected
+				;seg es register to current extra segment
+						 
+ 000A  B8 ---- R				mov	ax,extra	 
+ 000D  8E C0					mov	es,ax 
+				;main part of program goes here 
+ 000F  8D 36 0000 R				lea	si,source_buffer 
+ 0013  8D 3E 0000 R				lea	di,dest_buffer 
+ 0017  FC					cld			
+					;set DF flag to forward 
+ 0018  B9 0028					mov	cx,40 
+ 001B  F3/ A4					rep	movsb 
+ 001D  CB					ret 
+ 001E				main		endp 
+				;----------------------------------------------
+				 
+ 001E				code		ends 
+				;********************************************* 
+						end	start 
+Microsoft (R) Macro Assembler Version 5.00                  10/11/5                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+CODE . . . . . . . . . . . . . .  	001E	PARA	NONE	
+DATA . . . . . . . . . . . . . .  	0028	PARA	NONE	
+EXTRA  . . . . . . . . . . . . .  	0028	PARA	NONE	
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+DEST_BUFFER  . . . . . . . . . .  	L BYTE	0000	EXTRA	Length = 0028
+
+MAIN . . . . . . . . . . . . . .  	F PROC	0000	CODE	Length = 001E
+
+SOURCE_BUFFER  . . . . . . . . .  	L BYTE	0000	DATA	Length = 0028
+START  . . . . . . . . . . . . .  	L NEAR	0000	CODE
+
+@FILENAME  . . . . . . . . . . .  	TEXT  p162		
+
+
+     42 Source  Lines
+     42 Total   Lines
+      9 Symbols
+
+  50364 + 450868 Bytes symbol space free
+
+      0 Warning Errors
+      1 Severe  Errors

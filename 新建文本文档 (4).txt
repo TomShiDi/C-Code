@@ -1,0 +1,74 @@
+#include<stdio.h>
+int main()
+{
+	long int n,p1,p2,m,s,a[10];
+	int i,t,j;
+	//scanf("%d",&t);
+	while(scanf("%ld",&n)!=EOF)
+	{
+		//scanf("%ld",&n);
+		
+		i=0;
+		s=0;
+		for(m=n+1;m<10000000000;m++)
+		{
+			for(j=0;j<10;j++)
+			    a[j]=0;
+			s=0;
+			i=0;
+			for(p1=m%10,p2=m/10;i<10;)
+			{
+					a[i]=p1;
+					p1=p2;
+					p2=p2/10;
+					p1=p1%10;
+					i++;
+				/*if(p2>0)
+				{
+					p3=p2/10;
+					a[i]=p2%10;
+					p2=p3;
+				}
+				break;*/
+			}
+			if(m<10)
+			    for(i=0;i<1;i++)
+				    s=s*10+a[i];
+				if(m>=10&&m<=99)
+					for(i=0;i<2;i++)
+				    s=s*10+a[i];
+				if(m>99&&m<=999)
+					for(i=0;i<3;i++)
+				    s=s*10+a[i];
+				if(m>999&&m<=9999)
+					for(i=0;i<4;i++)
+				    s=s*10+a[i];
+				if(m>9999&&m<=99999)
+					for(i=0;i<5;i++)
+				    s=s*10+a[i];
+				if(m>99999&&m<=999999)
+					for(i=0;i<6;i++)
+				    s=s*10+a[i];
+				if(m>999999&&m<=9999999)
+					for(i=0;i<7;i++)
+				    s=s*10+a[i];
+				if(m>9999999&&m<=99999999)
+					for(i=0;i<8;i++)
+				    s=s*10+a[i];
+				if(m>99999999&&m<=999999999)
+					for(i=0;i<9;i++)
+				    s=s*10+a[i];
+				if(m>999999999)
+					for(i=0;i<10;i++)
+						s=s*10+a[i];
+
+		    if(s==m)
+			{
+			    printf("%d\n",m);
+			    break;
+			}
+		}
+	}
+	return 0;
+}
+			

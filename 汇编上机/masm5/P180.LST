@@ -1,0 +1,70 @@
+Microsoft (R) Macro Assembler Version 5.00                  10/23/4                                                             Page     1-1
+
+
+				;p180.asm,检索，查到删除该数。 
+ 0000				program	segment 
+ 0000				main	proc	  far 
+					assume 	cs:program 
+ 0000  1E			start:	push	ds 
+ 0001  2B C0				sub	ax,ax 
+ 0003  50				push	ax		;和ret配合使用 
+ 0004  FC				cld 
+ 0005  57				push	di 
+ 0006  26: 8B 0D			mov	cx,es:[di] 
+ 0009  8B C1				mov	ax,cx		;修改。查串长值
+				元素是否存在。 
+ 000B  83 C7 02				add	di,2 
+ 000E  F2/ AF				repne	scasw		;在串中查找与ax
+				值相等者。 
+ 0010  74 03				je	delete 
+ 0012  5F				pop	di 
+ 0013  EB 12				jmp	short exit	;没有找到，直接
+				退出。 
+ 0015  E3 0C			delete:	jcxz	dec_cnt		;找到，是最后一
+				个，直接将串长减1。 
+ 0017  26: 8B 1D		next_el:mov	bx,es:[di]	;找到，元素往前
+				移一个位置。 
+ 001A  26: 89 5D FE			mov	es:[di-2],bx	; 
+ 001E  83 C7 02				add	di,2 
+ 0021  E2 F4				loop	next_el 
+ 0023  5F			dec_cnt:pop	di 
+ 0024  26: FF 0D			dec	word ptr es:[di] 
+ 0027  CB			exit:	ret 
+ 0028				main	endp 
+ 0028				program	ends 
+					end 
+Microsoft (R) Macro Assembler Version 5.00                  10/23/4                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+PROGRAM  . . . . . . . . . . . .  	0028	PARA	NONE	
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+DEC_CNT  . . . . . . . . . . . .  	L NEAR	0023	PROGRAM
+DELETE . . . . . . . . . . . . .  	L NEAR	0015	PROGRAM
+
+EXIT . . . . . . . . . . . . . .  	L NEAR	0027	PROGRAM
+
+MAIN . . . . . . . . . . . . . .  	F PROC	0000	PROGRAM	Length = 0028
+
+NEXT_EL  . . . . . . . . . . . .  	L NEAR	0017	PROGRAM
+
+START  . . . . . . . . . . . . .  	L NEAR	0000	PROGRAM
+
+@FILENAME  . . . . . . . . . . .  	TEXT  p180		
+
+
+     27 Source  Lines
+     27 Total   Lines
+      9 Symbols
+
+  50262 + 450746 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

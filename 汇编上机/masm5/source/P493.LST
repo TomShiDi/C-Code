@@ -1,0 +1,296 @@
+Microsoft (R) Macro Assembler Version 5.00                  11/30/4                                                             Page     1-1
+
+
+				;利用文件代号随机读取磁盘文件 
+				; 
+				;	 
+					.model small 
+ 0040					.stack	64 
+				; 
+				;******************************************* 
+				; 
+ 0000					.data 
+ 0000  ????			handle	dw	? 
+ 0002  ????			recindx	dw	? 
+ 0004  00			errcde	db	0 
+ 0005  72 65 63 6F 72 64 20	prompt	db	'record number?' 
+       6E 75 6D 62 65 72 3F	
+ 0013  0020[			ioarea	db	32 dup(' ') 
+	   20			
+			 ]	
+				
+ 0033  64 3A 5C 6E 61 6D 65	pathnam	db	'd:\name.dat',0 
+       2E 64 61 74 00		
+ 003F  2A 2A 2A 20 6F 70 65	openmsg	db	'*** open error ***',0dh,0ah 
+       6E 20 65 72 72 6F 72	
+       20 2A 2A 2A 0D 0A	
+ 0053  2A 2A 2A 20 72 65 61	readmsg	db	'*** read error ***',0dh,0ah 
+       64 20 65 72 72 6F 72	
+       20 2A 2A 2A 0D 0A	
+ 0067  00			row	db	0 
+ 0068  00			col	db	0 
+				; 
+ 0069				recdpar	label	byte 
+ 0069  03			maxlen	db	3 
+ 006A  ??			actlen	db	? 
+ 006B  0003[			recdno	db	3 dup(' ') 
+	   20			
+			 ]	
+				
+				; 
+				;******************************************* 
+				; 
+ 0000					.code 
+					.386 
+p493.ASM(29): error A2113: Cannot change processor in segment
+ 0000				main	proc	far 
+ 0000  66| B8 ---- R			mov	ax,@data 
+ 0004  66| 8E D8			mov	ds,ax 
+ 0007  66| 8E C0			mov	es,ax 
+				; 
+ 000A  66| B8 0600			mov	ax,0600h 
+ 000E  E8 0000018B R			call	scrn 
+ 0013  E8 00000198 R			call	curs 
+ 0018  E8 0000005B R			call 	openran 
+ 001D  80 3D 00000004 R 00		cmp	errcde,0 
+ 0024  0F 85 00000055 R			jnz	exit 
+ 002A  E8 00000087 R		callsub:call	recnum 
+Microsoft (R) Macro Assembler Version 5.00                  11/30/4                                                             Page     1-2
+
+
+ 002F  80 3D 0000006A R 00		cmp	actlen,0 
+ 0036  0F 84 00000055 R			je	exit 
+ 003C  E8 000000ED R			call 	readran 
+ 0041  80 3D 00000004 R 00		cmp	errcde,0 
+ 0048  0F 85 00000053 R			jnz	next 
+ 004E  E8 0000014B R			call	disp 
+ 0053  EB D5			next:	jmp	callsub 
+ 0055  66| B8 4C00		exit:	mov	ax,4c00h 
+ 0059  CD 21				int	21h 
+ 005B				main	endp 
+				; 
+				;------------------------------------------- 
+				; 
+				; 
+				; 
+ 005B				openran	proc 
+ 005B  B4 3D				mov	ah,3dh 
+ 005D  B0 00				mov	al,0 
+ 005F  8D 15 00000033 R			lea	dx,pathnam 
+ 0065  CD 21				int 	21h 
+ 0067  0F 82 00000074 R			jc	errm1 
+ 006D  66| A3 00000000 R		mov	handle,ax 
+ 0073  C3				ret 
+ 0074  C6 05 00000004 R 01	errm1:	mov	errcde,1 
+ 007B  8D 15 0000003F R			lea	dx,openmsg 
+ 0081  E8 000001AB R			call	errorp 
+ 0086  C3				ret 
+ 0087				openran	endp 
+				; 
+				;-------------------------------------------- 
+				; 
+				; 
+				; 
+ 0087				recnum	proc 
+ 0087  B4 40				mov	ah,40h 
+ 0089  66| BB 0001			mov	bx,1 
+ 008D  66| B9 000F			mov	cx,15 
+ 0091  8D 15 00000005 R			lea	dx,prompt 
+ 0097  CD 21				int 	21h 
+				; 
+ 0099  B4 0A				mov	ah,0ah 
+ 009B  8D 15 00000069 R			lea	dx,recdpar 
+ 00A1  CD 21				int	21h 
+				; 
+ 00A3  80 3D 0000006A R 01		cmp	actlen,1 
+ 00AA  0F 82 000000E0 R			jb	endd 
+ 00B0  0F 87 000000C2 R			ja	twodgt 
+ 00B6  32 E4				xor	ah,ah 
+ 00B8  A0 0000006B R			mov	al,recdno 
+ 00BD  EB 0E 90 90 90			jmp	conv 
+ 00C2  8A 25 0000006B R		twodgt:	mov	ah,recdno 
+ 00C8  A0 0000006C R			mov	al,recdno+1 
+ 00CD  66| 25 0F0F		conv:	and	ax,0f0fh 
+ 00D1  D5 0A				aad 
+Microsoft (R) Macro Assembler Version 5.00                  11/30/4                                                             Page     1-3
+
+
+ 00D3  66| 48				dec	ax 
+ 00D5  B1 04				mov	cl,04 
+ 00D7  66| D3 E0			shl	ax,cl 
+ 00DA  66| A3 00000002 R		mov	recindx,ax 
+ 00E0  C6 05 00000068 R 14	endd:	mov	col,20 
+ 00E7  E8 00000198 R			call	curs 
+ 00EC  C3				ret 
+ 00ED				recnum	endp 
+				; 
+				;----------------------------------------------
+				------- 
+				; 
+				; 
+				; 
+ 00ED				readran	proc 
+ 00ED  B4 42				mov	ah,42h 
+ 00EF  B0 00				mov	al,0 
+ 00F1  66| 8B 1D 00000000 R		mov	bx,handle 
+ 00F8  66| B9 0000			mov	cx,0 
+ 00FC  66| 8B 15 00000002 R		mov	dx,recindx 
+ 0103  CD 21				int	21h 
+ 0105  0F 82 00000138 R			jc	errm2 
+				; 
+ 010B  B4 3F				mov	ah,3fh 
+ 010D  66| 8B 1D 00000000 R		mov	bx,handle 
+ 0114  66| B9 0020			mov	cx,32 
+ 0118  8D 15 00000013 R			lea	dx,ioarea 
+ 011E  CD 21				int 	21h 
+ 0120  0F 82 00000138 R			jc	errm2 
+ 0126  80 3D 00000013 R 1A		cmp	ioarea,1ah 
+ 012D  0F 84 00000143 R			je	exit2 
+ 0133  EB 15 90 90 90			jmp	back 
+ 0138  8D 15 00000053 R		errm2:	lea	dx,readmsg 
+ 013E  E8 000001AB R			call	errorp 
+ 0143  C6 05 00000004 R 01	exit2:	mov	errcde,1 
+ 014A  C3			back:	ret 
+ 014B				readran	endp 
+				; 
+				;----------------------------------------------
+				------ 
+				; 
+				; 
+				; 
+ 014B				disp	proc 
+ 014B  B4 40				mov	ah,40h 
+ 014D  66| BB 0001			mov	bx,1 
+ 0151  66| B9 0020			mov	cx,32 
+ 0155  8D 15 00000013 R			lea	dx,ioarea 
+ 015B  CD 21				int 	21h 
+ 015D  C6 05 00000068 R 00		mov	col,0 
+ 0164  80 3D 00000067 R 14		cmp	row,20 
+ 016B  0F 83 0000017C R			jae	scrol 
+ 0171  FE 05 00000067 R			inc	row 
+ 0177  EB 11 90 90 90			jmp	return 
+Microsoft (R) Macro Assembler Version 5.00                  11/30/4                                                             Page     1-4
+
+
+ 017C  66| B8 0601		scrol:	mov	ax,0601h 
+ 0180  E8 0000018B R			call	scrn 
+ 0185  E8 00000198 R			call	curs 
+ 018A  C3			return:	ret 
+ 018B				disp	endp 
+				; 
+				;----------------------------------------------
+				-------- 
+				;设置屏幕。 
+				; 
+ 018B				scrn  	proc 
+ 018B  B7 1E			        mov bh,1eh 
+ 018D  66| B9 0000		        mov cx,0 
+ 0191  66| BA 184F		        mov dx,184fh 
+ 0195  CD 10			        int 10h 
+ 0197  C3			        ret 
+ 0198				scrn    endp 
+				;--------------------------------------------- 
+				;设置光标位置。 
+				; 
+ 0198				curs    proc 
+ 0198  B4 02			        mov ah,2 
+ 019A  B7 00			        mov bh,0 
+ 019C  8A 35 00000067 R		        mov dh,row 
+ 01A2  8A 15 00000068 R		        mov dl,col 
+ 01A8  CD 10			        int 10h 
+ 01AA  C3			        ret 
+ 01AB				curs    endp 
+				;--------------------------------------------- 
+				;显示出错信息。 
+				; 
+ 01AB				errorp  proc 
+ 01AB  B4 40			        mov ah,40h 
+ 01AD  66| BB 0001		        mov bx,1 
+ 01B1  66| B9 0020		        mov cx,20h 
+ 01B5  CD 21			        int 21h 
+ 01B7  C3			        ret 
+ 01B8				errorp  endp 
+				;----------------------------------------------
+				--- 
+ 01B8				        end main 
+Microsoft (R) Macro Assembler Version 5.00                  11/30/4                                                             Symbols-1
+
+
+
+
+                N a m e         	Size	Length	 Align	Combine Class
+
+DGROUP . . . . . . . . . . . . .  	GROUP
+  _DATA  . . . . . . . . . . . .  	16 Bit	006E	WORD	PUBLIC	'DATA'
+  STACK  . . . . . . . . . . . .  	16 Bit	0040	PARA	STACK	'STACK'
+_TEXT  . . . . . . . . . . . . .  	16 Bit	01B8	WORD	PUBLIC	'CODE'
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+ACTLEN . . . . . . . . . . . . .  	L BYTE	006A	_DATA
+
+BACK . . . . . . . . . . . . . .  	L NEAR	014A	_TEXT
+
+CALLSUB  . . . . . . . . . . . .  	L NEAR	002A	_TEXT
+COL  . . . . . . . . . . . . . .  	L BYTE	0068	_DATA
+CONV . . . . . . . . . . . . . .  	L NEAR	00CD	_TEXT
+CURS . . . . . . . . . . . . . .  	N PROC	0198	_TEXT	Length = 0013
+
+DISP . . . . . . . . . . . . . .  	N PROC	014B	_TEXT	Length = 0040
+
+ENDD . . . . . . . . . . . . . .  	L NEAR	00E0	_TEXT
+ERRCDE . . . . . . . . . . . . .  	L BYTE	0004	_DATA
+ERRM1  . . . . . . . . . . . . .  	L NEAR	0074	_TEXT
+ERRM2  . . . . . . . . . . . . .  	L NEAR	0138	_TEXT
+ERRORP . . . . . . . . . . . . .  	N PROC	01AB	_TEXT	Length = 000D
+EXIT . . . . . . . . . . . . . .  	L NEAR	0055	_TEXT
+EXIT2  . . . . . . . . . . . . .  	L NEAR	0143	_TEXT
+
+HANDLE . . . . . . . . . . . . .  	L WORD	0000	_DATA
+
+IOAREA . . . . . . . . . . . . .  	L BYTE	0013	_DATA	Length = 0020
+
+MAIN . . . . . . . . . . . . . .  	F PROC	0000	_TEXT	Length = 005B
+MAXLEN . . . . . . . . . . . . .  	L BYTE	0069	_DATA
+
+NEXT . . . . . . . . . . . . . .  	L NEAR	0053	_TEXT
+
+OPENMSG  . . . . . . . . . . . .  	L BYTE	003F	_DATA
+OPENRAN  . . . . . . . . . . . .  	N PROC	005B	_TEXT	Length = 002C
+
+PATHNAM  . . . . . . . . . . . .  	L BYTE	0033	_DATA
+PROMPT . . . . . . . . . . . . .  	L BYTE	0005	_DATA
+
+READMSG  . . . . . . . . . . . .  	L BYTE	0053	_DATA
+READRAN  . . . . . . . . . . . .  	N PROC	00ED	_TEXT	Length = 005E
+RECDNO . . . . . . . . . . . . .  	L BYTE	006B	_DATA	Length = 0003
+RECDPAR  . . . . . . . . . . . .  	L BYTE	0069	_DATA
+RECINDX  . . . . . . . . . . . .  	L WORD	0002	_DATA
+RECNUM . . . . . . . . . . . . .  	N PROC	0087	_TEXT	Length = 0066
+RETURN . . . . . . . . . . . . .  	L NEAR	018A	_TEXT
+Microsoft (R) Macro Assembler Version 5.00                  11/30/4                                                             Symbols-2
+
+
+ROW  . . . . . . . . . . . . . .  	L BYTE	0067	_DATA
+
+SCRN . . . . . . . . . . . . . .  	N PROC	018B	_TEXT	Length = 000D
+SCROL  . . . . . . . . . . . . .  	L NEAR	017C	_TEXT
+
+TWODGT . . . . . . . . . . . . .  	L NEAR	00C2	_TEXT
+
+@CODE  . . . . . . . . . . . . .  	TEXT  _TEXT		
+@CODESIZE  . . . . . . . . . . .  	TEXT  0		
+@DATASIZE  . . . . . . . . . . .  	TEXT  0		
+@FILENAME  . . . . . . . . . . .  	TEXT  p493		
+
+
+    186 Source  Lines
+    186 Total   Lines
+     48 Symbols
+
+  50284 + 450612 Bytes symbol space free
+
+      0 Warning Errors
+      1 Severe  Errors

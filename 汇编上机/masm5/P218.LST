@@ -1,0 +1,92 @@
+Microsoft (R) Macro Assembler Version 5.00                  11/7/4                                                             Page     1-1
+
+
+				;p218.asm数组元素相加送结果单元子程序。 
+				; 
+				;************************************* 
+ 0000				data	segment 
+ 0000  0064[			ary	dw	100 dup(?) 
+	   ????			
+			 ]	
+				
+ 00C8  0064			count	dw	100 
+ 00CA  ????			sum	dw	? 
+ 00CC				data	ends 
+				;************************************* 
+				; 
+				;************************************* 
+ 0000				code	segment 
+					assume	cs:code,ds:data 
+				;====================================== 
+				; 
+ 0000				main	proc	far 
+ 0000  1E			start:	push	ds 
+ 0001  2B C0				sub	ax,ax 
+ 0003  50				push	ax 
+ 0004  B8 ---- R			mov	ax,data 
+ 0007  8E D8				mov	ds,ax 
+ 0009  E8 000D R			call	near  ptr  proadd 
+ 000C  CB				ret 
+ 000D				main	endp 
+				;======================================= 
+				; 
+				;--------------------------------------	 
+ 000D				proadd	proc	near 
+ 000D  50				push	ax 
+ 000E  51				push	cx 
+ 000F  56				push	si 
+ 0010  8D 36 0000 R			lea	si,ary 
+ 0014  8B 0E 00C8 R			mov	cx,count 
+ 0018  33 C0				xor	ax,ax 
+ 001A  03 04			next:	add	ax,[si] 
+ 001C  83 C6 02				add	si,2	 
+ 001F  E2 F9				loop	next 
+ 0021  A3 00CA R			mov	sum,ax 
+ 0024  5E				pop	si 
+ 0025  59				pop	cx 
+ 0026  58				pop	ax 
+ 0027  C3				ret 
+ 0028				proadd	endp 
+				;--------------------------------------- 
+				; 
+ 0028				code	ends 
+				;***************************************** 
+					end	start 
+Microsoft (R) Macro Assembler Version 5.00                  11/7/4                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+CODE . . . . . . . . . . . . . .  	0028	PARA	NONE	
+DATA . . . . . . . . . . . . . .  	00CC	PARA	NONE	
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+ARY  . . . . . . . . . . . . . .  	L WORD	0000	DATA	Length = 0064
+
+COUNT  . . . . . . . . . . . . .  	L WORD	00C8	DATA
+
+MAIN . . . . . . . . . . . . . .  	F PROC	0000	CODE	Length = 000D
+
+NEXT . . . . . . . . . . . . . .  	L NEAR	001A	CODE
+
+PROADD . . . . . . . . . . . . .  	N PROC	000D	CODE	Length = 001B
+
+START  . . . . . . . . . . . . .  	L NEAR	0000	CODE
+SUM  . . . . . . . . . . . . . .  	L WORD	00CA	DATA
+
+@FILENAME  . . . . . . . . . . .  	TEXT  p218		
+
+
+     48 Source  Lines
+     48 Total   Lines
+     11 Symbols
+
+  50332 + 450676 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors
